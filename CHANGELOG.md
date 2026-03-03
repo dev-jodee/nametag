@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.28.0](https://github.com/mattogodoy/nametag/compare/v0.27.3...v0.28.0) (2026-03-03)
+
+
+### Features
+
+* add custom DatePicker component with three inline fields ([8776913](https://github.com/mattogodoy/nametag/commit/8776913b197d03c5a065012e1d30c15ff60c076b))
+* add date validation utilities (leap year, days in month, clamp) ([0f6a9fe](https://github.com/mattogodoy/nametag/commit/0f6a9fed1c1c6e32f26fa3254692a6fe41d12113))
+* add i18n keys for DatePicker component ([a6318d4](https://github.com/mattogodoy/nametag/commit/a6318d451a15a2a6a42e90456f6148401ee0c08f))
+* custom DatePicker with dropdown fields ([27511f6](https://github.com/mattogodoy/nametag/commit/27511f61ab83627c82628be04fe9c8a96c08a42c))
+* integrate DatePicker into ImportantDatesManager for add/edit forms ([5867d27](https://github.com/mattogodoy/nametag/commit/5867d27724940198fa5b9cedcc253ef05fddc0bf))
+* integrate DatePicker into PersonForm Last Contact field ([189a1e8](https://github.com/mattogodoy/nametag/commit/189a1e8cf2b9a2a32e75f997d3c153e08f904ee9))
+
+
+### Bug Fixes
+
+* clear year field when unchecking year-unknown instead of showing 1604 ([b1f7e98](https://github.com/mattogodoy/nametag/commit/b1f7e98f1a95e95afb775d1d24dce53cb6bb3ec7))
+* re-emit date when yearUnknown toggled and restore CSS hover tooltip ([18536b1](https://github.com/mattogodoy/nametag/commit/18536b1b19f856c8c7a403c08b47e199dd623c85))
+
 ## [0.27.3](https://github.com/mattogodoy/nametag/compare/v0.27.2...v0.27.3) (2026-03-02)
 
 
