@@ -73,11 +73,11 @@ export default async function ImportPage({
   // Get user's groups and relationship types for assignment
   const [groups, relationshipTypes] = await Promise.all([
     prisma.group.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
       orderBy: { name: 'asc' },
     }),
     prisma.relationshipType.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
       orderBy: { label: 'asc' },
       select: { id: true, label: true, color: true },
     }),

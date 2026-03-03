@@ -86,7 +86,7 @@ describe('People API', () => {
       expect(body.people).toEqual(mockPeople);
       expect(mocks.personFindMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { userId: 'user-123' },
+          where: { userId: 'user-123', deletedAt: null },
         })
       );
     });
@@ -266,7 +266,7 @@ describe('People API', () => {
 
       expect(mocks.personFindUnique).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'other-user-person', userId: 'user-123' },
+          where: { id: 'other-user-person', userId: 'user-123', deletedAt: null },
         })
       );
     });

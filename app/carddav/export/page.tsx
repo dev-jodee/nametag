@@ -36,6 +36,7 @@ export default async function ExportPage() {
   const allPeople = await prisma.person.findMany({
     where: {
       userId: session.user.id,
+      deletedAt: null,
     },
     select: {
       id: true,
@@ -56,6 +57,7 @@ export default async function ExportPage() {
   const unexcludedPeople = await prisma.person.findMany({
     where: {
       id: { in: unmappedPeopleIds },
+      deletedAt: null,
     },
     include: {
       groups: {

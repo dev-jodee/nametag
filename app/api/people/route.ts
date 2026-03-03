@@ -20,8 +20,9 @@ export const GET = withAuth(async (request, session) => {
     const includeDetails = searchParams.get('includeDetails') !== 'false';
 
     // Build where clause
-    const where: { userId: string; groups?: { some: { groupId: { in: string[] } } } } = {
+    const where: { userId: string; deletedAt: null; groups?: { some: { groupId: { in: string[] } } } } = {
       userId: session.user.id,
+      deletedAt: null,
     };
 
     // Filter by groups if specified
@@ -153,7 +154,7 @@ export const POST = withAuth(async (request, session) => {
     // If connectedThroughId is provided, verify the person exists and belongs to user
     if (connectedThroughId) {
       const basePerson = await prisma.person.findUnique({
-        where: { id: connectedThroughId, userId: session.user.id },
+        where: { id: connectedThroughId, userId: session.user.id, deletedAt: null },
       });
 
       if (!basePerson) {
@@ -345,7 +346,7 @@ export const POST = withAuth(async (request, session) => {
     if (connectedThroughId) {
       // Find the relationshipType and its inverse
       const relationshipType = await prisma.relationshipType.findUnique({
-        where: { id: relationshipToUserId },
+        where: { id: relationshipToUserId, deletedAt: null },
         select: { inverseId: true },
       });
 

@@ -10,7 +10,9 @@ const mocks = vi.hoisted(() => ({
   importantDateUpdate: vi.fn(),
   personUpdate: vi.fn(),
   importantDateFindUnique: vi.fn(),
+  importantDateFindFirst: vi.fn(),
   personFindUnique: vi.fn(),
+  personFindFirst: vi.fn(),
   formatFullName: vi.fn(),
 }));
 
@@ -26,10 +28,12 @@ vi.mock('../../lib/prisma', () => ({
     importantDate: {
       update: mocks.importantDateUpdate,
       findUnique: mocks.importantDateFindUnique,
+      findFirst: mocks.importantDateFindFirst,
     },
     person: {
       update: mocks.personUpdate,
       findUnique: mocks.personFindUnique,
+      findFirst: mocks.personFindFirst,
     },
   },
 }));
@@ -522,7 +526,7 @@ describe('unsubscribe-tokens', () => {
       };
 
       mocks.unsubscribeTokenFindUnique.mockResolvedValue(token);
-      mocks.importantDateFindUnique.mockResolvedValue(importantDate);
+      mocks.importantDateFindFirst.mockResolvedValue(importantDate);
       mocks.formatFullName.mockReturnValue('John Doe');
 
       const result = await getUnsubscribeDetails('test-token');
@@ -554,7 +558,7 @@ describe('unsubscribe-tokens', () => {
       };
 
       mocks.unsubscribeTokenFindUnique.mockResolvedValue(token);
-      mocks.personFindUnique.mockResolvedValue(person);
+      mocks.personFindFirst.mockResolvedValue(person);
       mocks.formatFullName.mockReturnValue('Jane Smith');
 
       const result = await getUnsubscribeDetails('test-token');
@@ -585,7 +589,7 @@ describe('unsubscribe-tokens', () => {
       };
 
       mocks.unsubscribeTokenFindUnique.mockResolvedValue(usedToken);
-      mocks.personFindUnique.mockResolvedValue({
+      mocks.personFindFirst.mockResolvedValue({
         name: 'Test',
         surname: 'User',
         middleName: null,
@@ -614,7 +618,7 @@ describe('unsubscribe-tokens', () => {
       };
 
       mocks.unsubscribeTokenFindUnique.mockResolvedValue(expiredToken);
-      mocks.personFindUnique.mockResolvedValue({
+      mocks.personFindFirst.mockResolvedValue({
         name: 'Test',
         surname: 'User',
         middleName: null,

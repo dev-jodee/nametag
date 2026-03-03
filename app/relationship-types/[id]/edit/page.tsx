@@ -25,6 +25,7 @@ export default async function EditRelationshipTypePage({
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
       include: {
         inverse: {
@@ -39,6 +40,7 @@ export default async function EditRelationshipTypePage({
     prisma.relationshipType.findMany({
       where: {
         userId: session.user.id,
+        deletedAt: null,
         NOT: { id }, // Exclude current type from inverse options
       },
       select: {

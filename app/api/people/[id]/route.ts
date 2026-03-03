@@ -19,6 +19,7 @@ export const GET = withAuth(async (_request, session, context) => {
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
       include: {
         relationshipToUser: true,
@@ -110,6 +111,7 @@ export const PUT = withAuth(async (request, session, context) => {
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
     });
 
@@ -120,7 +122,7 @@ export const PUT = withAuth(async (request, session, context) => {
     // Check reminder limits if adding new reminders
     // Get current reminders for this person
     const currentPersonReminders = await prisma.importantDate.count({
-      where: { personId: id, reminderEnabled: true },
+      where: { personId: id, reminderEnabled: true, deletedAt: null },
     });
     const currentContactReminder = existingPerson.contactReminderEnabled ? 1 : 0;
 
@@ -397,6 +399,7 @@ export const DELETE = withAuth(async (request, session, context) => {
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
     });
 

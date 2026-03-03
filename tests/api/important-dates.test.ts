@@ -68,7 +68,7 @@ describe('Important Dates API', () => {
       await GET(request, context);
 
       expect(mocks.personFindUnique).toHaveBeenCalledWith({
-        where: { id: 'person-1', userId: 'user-123' },
+        where: { id: 'person-1', userId: 'user-123', deletedAt: null },
       });
     });
 

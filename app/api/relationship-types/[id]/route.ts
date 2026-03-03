@@ -9,6 +9,7 @@ export const GET = withAuth(async (_request, session, context) => {
     where: {
       id,
       userId: session.user.id,
+      deletedAt: null,
     },
     include: {
       inverse: {
@@ -37,6 +38,7 @@ export const PUT = withAuth(async (request, session, context) => {
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
     });
 
@@ -61,6 +63,7 @@ export const PUT = withAuth(async (request, session, context) => {
         userId: session.user.id,
         name: { equals: normalizedName, mode: 'insensitive' },
         id: { not: id }, // Exclude the current type being updated
+        deletedAt: null,
       },
     });
 
@@ -107,6 +110,7 @@ export const PUT = withAuth(async (request, session, context) => {
         where: {
           userId: session.user.id,
           name: { equals: inverseName, mode: 'insensitive' },
+          deletedAt: null,
         },
       });
 
@@ -170,6 +174,7 @@ export const DELETE = withAuth(async (_request, session, context) => {
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
     });
 
@@ -181,6 +186,7 @@ export const DELETE = withAuth(async (_request, session, context) => {
     const inUseCount = await prisma.relationship.count({
       where: {
         relationshipTypeId: id,
+        deletedAt: null,
         person: { deletedAt: null },
         relatedPerson: { deletedAt: null },
       },

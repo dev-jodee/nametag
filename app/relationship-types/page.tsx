@@ -18,6 +18,7 @@ export default async function RelationshipTypesPage() {
   const relationshipTypes = await prisma.relationshipType.findMany({
     where: {
       userId: session.user.id,
+      deletedAt: null,
     },
     include: {
       inverse: {

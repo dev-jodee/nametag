@@ -42,6 +42,7 @@ export default async function NewPersonPage({
     prisma.group.findMany({
       where: {
         userId: session.user.id,
+        deletedAt: null,
       },
       orderBy: {
         name: 'asc',
@@ -50,6 +51,7 @@ export default async function NewPersonPage({
     prisma.relationshipType.findMany({
       where: {
         userId: session.user.id,
+        deletedAt: null,
       },
       orderBy: {
         label: 'asc',
@@ -58,6 +60,7 @@ export default async function NewPersonPage({
     prisma.person.findMany({
       where: {
         userId: session.user.id,
+        deletedAt: null,
       },
       select: {
         id: true,

@@ -161,8 +161,8 @@ export async function getUnsubscribeDetails(
   let entityName = '';
 
   if (unsubToken.reminderType === 'IMPORTANT_DATE') {
-    const importantDate = await prisma.importantDate.findUnique({
-      where: { id: unsubToken.entityId },
+    const importantDate = await prisma.importantDate.findFirst({
+      where: { id: unsubToken.entityId, deletedAt: null },
       include: {
         person: {
           select: {
@@ -181,8 +181,8 @@ export async function getUnsubscribeDetails(
       entityName = `${personName}'s ${importantDate.title}`;
     }
   } else if (unsubToken.reminderType === 'CONTACT') {
-    const person = await prisma.person.findUnique({
-      where: { id: unsubToken.entityId },
+    const person = await prisma.person.findFirst({
+      where: { id: unsubToken.entityId, deletedAt: null },
       select: {
         name: true,
         surname: true,

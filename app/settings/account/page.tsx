@@ -14,11 +14,11 @@ export default async function AccountSettingsPage() {
 
   const [groups, peopleCount] = await Promise.all([
     prisma.group.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
       orderBy: { name: 'asc' },
     }),
     prisma.person.count({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
     }),
   ]);
 

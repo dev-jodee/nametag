@@ -28,9 +28,13 @@ export default async function GroupDetailsPage({
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
       include: {
         people: {
+          where: {
+            person: { deletedAt: null },
+          },
           include: {
             person: {
               select: {
@@ -47,6 +51,7 @@ export default async function GroupDetailsPage({
     prisma.person.findMany({
       where: {
         userId: session.user.id,
+        deletedAt: null,
       },
       select: {
         id: true,

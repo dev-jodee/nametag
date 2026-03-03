@@ -7,6 +7,7 @@ export const GET = withAuth(async (_request, session) => {
   const relationshipTypes = await prisma.relationshipType.findMany({
     where: {
       userId: session.user.id,
+      deletedAt: null,
     },
     include: {
       inverse: {
@@ -41,6 +42,7 @@ export const POST = withAuth(async (request, session) => {
       where: {
         userId: session.user.id,
         name: { equals: normalizedName, mode: 'insensitive' },
+        deletedAt: null,
       },
     });
 
@@ -91,6 +93,7 @@ export const POST = withAuth(async (request, session) => {
         where: {
           userId: session.user.id,
           name: { equals: inverseName, mode: 'insensitive' },
+          deletedAt: null,
         },
       });
 

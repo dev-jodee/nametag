@@ -12,6 +12,7 @@ export const GET = withAuth(async (_request, session, context) => {
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
       include: {
         relationshipsFrom: {
@@ -45,6 +46,7 @@ export const GET = withAuth(async (_request, session, context) => {
       where: {
         id: { in: Array.from(relatedPersonIds) },
         userId: session.user.id,
+        deletedAt: null,
       },
       include: {
         relationshipToUser: true,

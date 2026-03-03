@@ -13,6 +13,7 @@ export const GET = withAuth(async (_request, session, context) => {
       where: {
         id: personId,
         userId: session.user.id,
+        deletedAt: null,
       },
       select: { photo: true },
     });

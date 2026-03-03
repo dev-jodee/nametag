@@ -18,6 +18,7 @@ export const GET = withAuth(async (_request, session, context) => {
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
       include: {
         relationshipToUser: {

@@ -10,7 +10,7 @@ export const GET = withAuth(async (_request, session, context) => {
 
     // Check if person exists and belongs to user
     const person = await prisma.person.findUnique({
-      where: { id, userId: session.user.id },
+      where: { id, userId: session.user.id, deletedAt: null },
     });
 
     if (!person) {
@@ -35,7 +35,7 @@ export const POST = withAuth(async (request, session, context) => {
 
     // Check if person exists and belongs to user
     const person = await prisma.person.findUnique({
-      where: { id, userId: session.user.id },
+      where: { id, userId: session.user.id, deletedAt: null },
     });
 
     if (!person) {

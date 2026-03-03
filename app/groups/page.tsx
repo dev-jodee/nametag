@@ -33,6 +33,7 @@ export default async function GroupsPage({
   const totalCount = await prisma.group.count({
     where: {
       userId: session.user.id,
+      deletedAt: null,
     },
   });
 
@@ -41,6 +42,7 @@ export default async function GroupsPage({
   const groups = await prisma.group.findMany({
     where: {
       userId: session.user.id,
+      deletedAt: null,
     },
     include: {
       _count: {

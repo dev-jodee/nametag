@@ -26,12 +26,12 @@ export default async function DashboardPage() {
   // Fetch groups, upcoming events, and people count
   const [groups, upcomingEvents, peopleCount] = await Promise.all([
     prisma.group.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
       orderBy: { name: 'asc' },
     }),
     getUpcomingEvents(session.user.id),
     prisma.person.count({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
     }),
   ]);
 

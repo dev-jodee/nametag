@@ -45,6 +45,7 @@ export default async function PeoplePage({
   const totalCount = await prisma.person.count({
     where: {
       userId: session.user.id,
+      deletedAt: null,
     },
   });
 
@@ -53,7 +54,7 @@ export default async function PeoplePage({
   // Fetch all people, groups, and relationship types in parallel
   const [allPeople, allGroups, relationshipTypes] = await Promise.all([
     prisma.person.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
       include: {
         relationshipToUser: { select: { label: true, color: true } },
         groups: { include: { group: { select: { name: true, color: true } } } },
@@ -62,12 +63,12 @@ export default async function PeoplePage({
       },
     }),
     prisma.group.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
       orderBy: { name: 'asc' },
       select: { id: true, name: true, color: true },
     }),
     prisma.relationshipType.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
       orderBy: { label: 'asc' },
       select: { id: true, label: true, color: true },
     }),

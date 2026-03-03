@@ -56,7 +56,7 @@ export const PUT = withAuth(async (request, session, context) => {
 
     // Find the existing relationship
     const existing = await prisma.relationship.findUnique({
-      where: { id },
+      where: { id, deletedAt: null },
       include: {
         person: true,
         relatedPerson: true,
@@ -81,6 +81,7 @@ export const PUT = withAuth(async (request, session, context) => {
       where: {
         id: relationshipTypeId,
         userId: session.user.id,
+        deletedAt: null,
       },
     });
 
@@ -102,6 +103,7 @@ export const PUT = withAuth(async (request, session, context) => {
       where: {
         personId: existing.relatedPersonId,
         relatedPersonId: existing.personId,
+        deletedAt: null,
       },
     });
 
@@ -128,7 +130,7 @@ export const DELETE = withAuth(async (_request, session, context) => {
 
     // Find the existing relationship
     const existing = await prisma.relationship.findUnique({
-      where: { id },
+      where: { id, deletedAt: null },
       include: {
         person: true,
       },
@@ -156,6 +158,7 @@ export const DELETE = withAuth(async (_request, session, context) => {
       where: {
         personId: existing.relatedPersonId,
         relatedPersonId: existing.personId,
+        deletedAt: null,
       },
     });
 

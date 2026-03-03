@@ -46,6 +46,10 @@ export const GET = withLogging(async function GET(request: Request) {
     const importantDates = await prisma.importantDate.findMany({
       where: {
         reminderEnabled: true,
+        deletedAt: null,
+        person: {
+          deletedAt: null,
+        },
       },
       include: {
         person: {
@@ -122,6 +126,7 @@ export const GET = withLogging(async function GET(request: Request) {
     const peopleWithContactReminders = await prisma.person.findMany({
       where: {
         contactReminderEnabled: true,
+        deletedAt: null,
       },
       include: {
         user: {

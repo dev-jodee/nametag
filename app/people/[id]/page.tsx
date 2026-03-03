@@ -132,6 +132,7 @@ export default async function PersonDetailsPage({
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
       include: {
         relationshipToUser: {
@@ -194,6 +195,7 @@ export default async function PersonDetailsPage({
     prisma.person.findMany({
       where: {
         userId: session.user.id,
+        deletedAt: null,
         NOT: { id },
       },
       select: {
@@ -209,6 +211,7 @@ export default async function PersonDetailsPage({
     prisma.relationshipType.findMany({
       where: {
         userId: session.user.id,
+        deletedAt: null,
       },
       select: {
         id: true,

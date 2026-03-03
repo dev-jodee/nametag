@@ -127,6 +127,24 @@ describe('billing/subscription', () => {
         groups: 5,
         reminders: 5, // 2 + 3
       });
+
+      // Verify deletedAt: null is included in all queries
+      expect(mocks.personCount).toHaveBeenCalledWith({
+        where: { userId: 'user-123', deletedAt: null },
+      });
+      expect(mocks.groupCount).toHaveBeenCalledWith({
+        where: { userId: 'user-123', deletedAt: null },
+      });
+      expect(mocks.importantDateCount).toHaveBeenCalledWith({
+        where: {
+          person: { userId: 'user-123', deletedAt: null },
+          reminderEnabled: true,
+          deletedAt: null,
+        },
+      });
+      expect(mocks.personCount).toHaveBeenCalledWith({
+        where: { userId: 'user-123', contactReminderEnabled: true, deletedAt: null },
+      });
     });
 
     it('should count reminders from both ImportantDates and contact reminders', async () => {

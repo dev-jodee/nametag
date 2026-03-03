@@ -67,17 +67,18 @@ export async function getUserUsage(userId: string): Promise<UserUsage> {
     await Promise.all([
       // Count people
       prisma.person.count({
-        where: { userId },
+        where: { userId, deletedAt: null },
       }),
       // Count groups
       prisma.group.count({
-        where: { userId },
+        where: { userId, deletedAt: null },
       }),
       // Count ImportantDate reminders (where reminderEnabled is true)
       prisma.importantDate.count({
         where: {
-          person: { userId },
+          person: { userId, deletedAt: null },
           reminderEnabled: true,
+          deletedAt: null,
         },
       }),
       // Count contact reminders (people with contactReminderEnabled)
@@ -85,6 +86,7 @@ export async function getUserUsage(userId: string): Promise<UserUsage> {
         where: {
           userId,
           contactReminderEnabled: true,
+          deletedAt: null,
         },
       }),
     ]);

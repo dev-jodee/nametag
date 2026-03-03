@@ -27,11 +27,13 @@ export default async function EditPersonPage({
       where: {
         id,
         userId: session.user.id,
+        deletedAt: null,
       },
       include: {
         groups: true,
         relationshipToUser: true,
         importantDates: {
+          where: { deletedAt: null },
           orderBy: {
             date: 'asc',
           },
@@ -48,6 +50,7 @@ export default async function EditPersonPage({
     prisma.group.findMany({
       where: {
         userId: session.user.id,
+        deletedAt: null,
       },
       orderBy: {
         name: 'asc',
@@ -56,6 +59,7 @@ export default async function EditPersonPage({
     prisma.relationshipType.findMany({
       where: {
         userId: session.user.id,
+        deletedAt: null,
       },
       orderBy: {
         label: 'asc',

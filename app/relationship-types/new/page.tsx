@@ -18,6 +18,7 @@ export default async function NewRelationshipTypePage() {
   const availableTypes = await prisma.relationshipType.findMany({
     where: {
       userId: session.user.id,
+      deletedAt: null,
     },
     select: {
       id: true,

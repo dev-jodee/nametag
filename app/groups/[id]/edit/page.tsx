@@ -24,6 +24,7 @@ export default async function EditGroupPage({
     where: {
       id,
       userId: session.user.id,
+      deletedAt: null,
     },
   });
 

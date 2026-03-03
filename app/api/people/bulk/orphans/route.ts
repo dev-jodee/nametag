@@ -15,7 +15,7 @@ export const POST = withAuth(async (request, session) => {
     let targetIds: string[];
     if (selectAll) {
       const allPeople = await prisma.person.findMany({
-        where: { userId: session.user.id },
+        where: { userId: session.user.id, deletedAt: null },
         select: { id: true },
       });
       targetIds = allPeople.map((p) => p.id);
@@ -27,7 +27,7 @@ export const POST = withAuth(async (request, session) => {
 
     // Fetch all people for this user with their relationships
     const allPeopleWithRels = await prisma.person.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, deletedAt: null },
       include: {
         relationshipToUser: { select: { id: true } },
         relationshipsFrom: {

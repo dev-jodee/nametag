@@ -62,6 +62,7 @@ export const POST = withAuth(async (request, session) => {
         personId,
         relatedPersonId,
         relationshipTypeId,
+        deletedAt: null,
       },
     });
 
@@ -72,15 +73,16 @@ export const POST = withAuth(async (request, session) => {
     // Verify both people belong to the user
     const [person, relatedPerson, relationshipType] = await Promise.all([
       prisma.person.findUnique({
-        where: { id: personId, userId: session.user.id },
+        where: { id: personId, userId: session.user.id, deletedAt: null },
       }),
       prisma.person.findUnique({
-        where: { id: relatedPersonId, userId: session.user.id },
+        where: { id: relatedPersonId, userId: session.user.id, deletedAt: null },
       }),
       prisma.relationshipType.findFirst({
         where: {
           id: relationshipTypeId,
           userId: session.user.id,
+          deletedAt: null,
         },
       }),
     ]);

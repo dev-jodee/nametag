@@ -13,6 +13,7 @@ export const GET = withAuth(async (request, session) => {
   const people = await prisma.person.findMany({
     where: {
       userId: session.user.id,
+      deletedAt: null,
       OR: [
         {
           name: {
