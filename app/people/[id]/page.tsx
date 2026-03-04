@@ -9,7 +9,8 @@ import UnifiedNetworkGraph from '@/components/UnifiedNetworkGraph';
 import Navigation from '@/components/Navigation';
 import PersonVCardRawView from '@/components/PersonVCardRawView';
 import PersonActionsMenu from '@/components/PersonActionsMenu';
-import { formatDate, formatDateWithoutYear, parseAsLocalDate } from '@/lib/date-format';
+import LastContactQuickUpdate from '@/components/LastContactQuickUpdate';
+import { formatDate, formatDateWithoutYear, parseAsLocalDate, type DateFormat } from '@/lib/date-format';
 import { formatFullName, formatGraphName } from '@/lib/nameUtils';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import PersonPhoto from '@/components/PersonPhoto';
@@ -90,15 +91,20 @@ function getRelativeTime(date: Date, t: (key: string, values?: Record<string, st
     return t('today');
   } else if (diffDays === 1) {
     return t('oneDayAgo');
-  } else if (diffDays < 30) {
+  } else if (diffDays < 28) {
     return t('daysAgo', { days: diffDays });
-  } else if (diffDays < 365) {
-    const months = Math.floor(diffDays / 30);
-    return months === 1 ? t('oneMonthAgo') : t('monthsAgo', { months });
-  } else {
-    const years = Math.floor(diffDays / 365);
-    return years === 1 ? t('oneYearAgo') : t('yearsAgo', { years });
   }
+
+  // Use calendar-based month/year diff for accuracy
+  let months = (now.getFullYear() - date.getFullYear()) * 12 + now.getMonth() - date.getMonth();
+  if (now.getDate() < date.getDate()) months--;
+
+  if (months < 12) {
+    if (months <= 0) return t('daysAgo', { days: diffDays });
+    return months === 1 ? t('oneMonthAgo') : t('monthsAgo', { months });
+  }
+  const years = Math.floor(months / 12);
+  return years === 1 ? t('oneYearAgo') : t('yearsAgo', { years });
 }
 
 export default async function PersonDetailsPage({
@@ -402,27 +408,12 @@ export default async function PersonDetailsPage({
                     </div>
                   )}
 
-                  {person.lastContact && (
-                    <div>
-                      <h4 className="text-sm font-medium text-muted mb-1">
-                        {t('lastTimeTalked')}
-                      </h4>
-                      <p className="text-foreground">
-                        {formatDate(new Date(person.lastContact), dateFormat)}{' '}
-                        <span className="text-sm text-muted">
-                          ({getRelativeTime(new Date(person.lastContact), t)})
-                        </span>
-                      </p>
-                      {getContactReminderDescription(person, t) && (
-                        <div className="text-xs text-primary mt-1 flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                          </svg>
-                          {getContactReminderDescription(person, t)}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <LastContactQuickUpdate
+                    personId={person.id}
+                    currentLastContact={person.lastContact ? new Date(person.lastContact).toISOString() : null}
+                    dateFormat={dateFormat as DateFormat}
+                    contactReminderDescription={getContactReminderDescription(person, t)}
+                  />
                 </div>
               </div>
 
