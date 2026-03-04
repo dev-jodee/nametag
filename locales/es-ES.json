@@ -1087,7 +1087,14 @@
       "zoom": "Zoom",
       "cancel": "Cancelar",
       "confirm": "Guardar",
-      "processing": "Procesando..."
+      "processing": "Procesando...",
+      "uploadLabel": "Subir foto",
+      "changeLabel": "Cambiar foto",
+      "removeLabel": "Eliminar foto",
+      "uploadError": "Error al subir la foto",
+      "removeError": "Error al eliminar la foto",
+      "formatError": "Formato no soportado. Usa JPEG, PNG, GIF o WebP.",
+      "sizeError": "La foto debe ser menor de 10MB"
     }
   },
   "groups": {

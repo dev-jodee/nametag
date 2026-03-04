@@ -1087,7 +1087,14 @@
       "zoom": "Zoom",
       "cancel": "Abbrechen",
       "confirm": "Speichern",
-      "processing": "Verarbeitung..."
+      "processing": "Verarbeitung...",
+      "uploadLabel": "Foto hochladen",
+      "changeLabel": "Foto ändern",
+      "removeLabel": "Foto entfernen",
+      "uploadError": "Foto konnte nicht hochgeladen werden",
+      "removeError": "Foto konnte nicht entfernt werden",
+      "formatError": "Format nicht unterstützt. Verwende JPEG, PNG, GIF oder WebP.",
+      "sizeError": "Das Foto darf maximal 10 MB groß sein"
     }
   },
   "groups": {

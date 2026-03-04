@@ -1087,7 +1087,14 @@
       "zoom": "Zoom",
       "cancel": "Cancel",
       "confirm": "Save",
-      "processing": "Processing..."
+      "processing": "Processing...",
+      "uploadLabel": "Upload photo",
+      "changeLabel": "Change photo",
+      "removeLabel": "Remove photo",
+      "uploadError": "Failed to upload photo",
+      "removeError": "Failed to remove photo",
+      "formatError": "Unsupported format. Use JPEG, PNG, GIF, or WebP.",
+      "sizeError": "Photo must be smaller than 10MB"
     }
   },
   "groups": {
