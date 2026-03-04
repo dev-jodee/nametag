@@ -149,7 +149,6 @@ export default function PersonForm({
   const [photoRemoved, setPhotoRemoved] = useState(false);
   const [pendingPhotoBlob, setPendingPhotoBlob] = useState<Blob | null>(null);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize knownThrough from URL params if provided
@@ -307,7 +306,7 @@ export default function PersonForm({
     reader.readAsDataURL(file);
   };
 
-  const handleCropConfirm = async (blob: Blob) => {
+  const handleCropConfirm = (blob: Blob) => {
     setCropImageSrc(null);
 
     // Revoke previous preview URL if any
@@ -317,51 +316,16 @@ export default function PersonForm({
     const previewUrl = URL.createObjectURL(blob);
     setPhotoPreview(previewUrl);
     setPhotoRemoved(false);
-
-    if (person?.id) {
-      // Edit mode: upload immediately
-      setIsUploadingPhoto(true);
-      try {
-        const formDataUpload = new FormData();
-        formDataUpload.append('photo', blob, 'photo.jpg');
-        const res = await fetch(`/api/people/${person.id}/photo`, {
-          method: 'POST',
-          body: formDataUpload,
-        });
-        if (!res.ok) {
-          toast.error(tPhoto('uploadError'));
-        }
-      } catch {
-        toast.error(tPhoto('uploadError'));
-      } finally {
-        setIsUploadingPhoto(false);
-      }
-    } else {
-      // Create mode: defer upload
-      setPendingPhotoBlob(blob);
-    }
+    setPendingPhotoBlob(blob);
   };
 
-  const handlePhotoRemove = async () => {
+  const handlePhotoRemove = () => {
     if (photoPreview) {
       URL.revokeObjectURL(photoPreview);
     }
     setPhotoPreview(null);
     setPhotoRemoved(true);
     setPendingPhotoBlob(null);
-
-    if (person?.id) {
-      try {
-        const res = await fetch(`/api/people/${person.id}/photo`, {
-          method: 'DELETE',
-        });
-        if (!res.ok) {
-          toast.error(tPhoto('removeError'));
-        }
-      } catch {
-        toast.error(tPhoto('removeError'));
-      }
-    }
   };
 
   // Create list of people including the user for autocomplete
@@ -418,17 +382,34 @@ export default function PersonForm({
         return;
       }
 
-      // Upload pending photo for newly created person (best effort)
-      if (mode === 'create' && pendingPhotoBlob && data.person?.id) {
-        try {
-          const photoFormData = new FormData();
-          photoFormData.append('photo', pendingPhotoBlob, 'photo.jpg');
-          await fetch(`/api/people/${data.person.id}/photo`, {
-            method: 'POST',
-            body: photoFormData,
-          });
-        } catch {
-          // Best effort — don't block redirect on failure
+      // Apply pending photo changes (upload or delete)
+      const personId = mode === 'create' ? data.person?.id : person?.id;
+      if (personId) {
+        if (pendingPhotoBlob) {
+          try {
+            const photoFormData = new FormData();
+            photoFormData.append('photo', pendingPhotoBlob, 'photo.jpg');
+            const photoRes = await fetch(`/api/people/${personId}/photo`, {
+              method: 'POST',
+              body: photoFormData,
+            });
+            if (!photoRes.ok) {
+              toast.error(tPhoto('uploadError'));
+            }
+          } catch {
+            toast.error(tPhoto('uploadError'));
+          }
+        } else if (photoRemoved) {
+          try {
+            const deleteRes = await fetch(`/api/people/${personId}/photo`, {
+              method: 'DELETE',
+            });
+            if (!deleteRes.ok) {
+              toast.error(tPhoto('removeError'));
+            }
+          } catch {
+            toast.error(tPhoto('removeError'));
+          }
         }
       }
 
@@ -545,15 +526,7 @@ export default function PersonForm({
             </button>
           )}
 
-          {/* Uploading spinner */}
-          {isUploadingPhoto && (
-            <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40">
-              <svg className="w-6 h-6 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-            </div>
-          )}
+
         </div>
         <span className="text-xs text-muted">
           {(person?.photo && !photoRemoved) || photoPreview ? tPhoto('changeLabel') : tPhoto('uploadLabel')}
