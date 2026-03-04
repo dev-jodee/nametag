@@ -41,6 +41,7 @@ const mocks = vi.hoisted(() => ({
   // CardDAV client
   fetchAddressBooks: vi.fn(),
   fetchVCards: vi.fn(),
+  fetchVCard: vi.fn(),
   createVCard: vi.fn(),
   updateVCard: vi.fn(),
 
@@ -92,6 +93,7 @@ vi.mock('@/lib/carddav/client', () => ({
     Promise.resolve({
       fetchAddressBooks: mocks.fetchAddressBooks,
       fetchVCards: mocks.fetchVCards,
+      fetchVCard: mocks.fetchVCard,
       createVCard: mocks.createVCard,
       updateVCard: mocks.updateVCard,
     })
@@ -138,7 +140,8 @@ vi.mock('uuid', () => ({
 }));
 
 // --- Import after mocks ---
-import { syncFromServer, syncToServer, bidirectionalSync } from '@/lib/carddav/sync';
+import { syncFromServer, syncToServer, bidirectionalSync, is412Error, createOrAdoptVCard } from '@/lib/carddav/sync';
+import type { AddressBook } from '@/lib/carddav/client';
 
 // --- Test data helpers ---
 
@@ -744,6 +747,376 @@ describe('CardDAV Sync Engine', () => {
           })
         );
       });
+    });
+  });
+
+  describe('is412Error', () => {
+    it('should detect 412 from error message (tsdav format)', () => {
+      expect(is412Error(new Error('CardDAV CREATE failed: 412 Precondition Failed'))).toBe(true);
+      expect(is412Error(new Error('CardDAV UPDATE failed: 412 Precondition Failed'))).toBe(true);
+    });
+
+    it('should detect 412 from status property on error object', () => {
+      const errorWithStatus = Object.assign(new Error('Precondition Failed'), { status: 412 });
+      expect(is412Error(errorWithStatus)).toBe(true);
+    });
+
+    it('should not match non-412 errors', () => {
+      expect(is412Error(new Error('CardDAV UPDATE failed: 404 Not Found'))).toBe(false);
+      expect(is412Error(new Error('Network timeout'))).toBe(false);
+      expect(is412Error(new Error('Something went wrong'))).toBe(false);
+    });
+
+    it('should not match when status property is not 412', () => {
+      const error500 = Object.assign(new Error('Server error'), { status: 500 });
+      expect(is412Error(error500)).toBe(false);
+    });
+
+    it('should handle non-Error values', () => {
+      expect(is412Error(null)).toBe(false);
+      expect(is412Error(undefined)).toBe(false);
+      expect(is412Error('412')).toBe(false);
+      expect(is412Error({ status: 412 })).toBe(true);
+    });
+  });
+
+  describe('createOrAdoptVCard', () => {
+    it('should fetch existing vCard and update it', async () => {
+      const mockClient = {
+        fetchAddressBooks: vi.fn(),
+        fetchVCards: vi.fn(),
+        fetchVCard: vi.fn().mockResolvedValue({
+          url: 'https://carddav.example.com/addressbooks/default/test.vcf',
+          etag: 'existing-etag',
+          data: 'old-data',
+        }),
+        createVCard: vi.fn(),
+        updateVCard: vi.fn().mockResolvedValue({
+          url: 'https://carddav.example.com/addressbooks/default/test.vcf',
+          etag: 'updated-etag',
+          data: 'new-data',
+        }),
+        deleteVCard: vi.fn(),
+      };
+
+      const addressBook = {
+        url: 'https://carddav.example.com/addressbooks/default/',
+        displayName: 'Contacts',
+        raw: {},
+      };
+
+      const result = await createOrAdoptVCard(
+        mockClient,
+        addressBook as unknown as AddressBook,
+        'new-vcard-data',
+        'test.vcf',
+        'person-1',
+      );
+
+      expect(mockClient.fetchVCard).toHaveBeenCalledWith(
+        addressBook,
+        'https://carddav.example.com/addressbooks/default/test.vcf',
+      );
+      expect(mockClient.updateVCard).toHaveBeenCalledWith(
+        { url: 'https://carddav.example.com/addressbooks/default/test.vcf', etag: 'existing-etag', data: '' },
+        'new-vcard-data',
+      );
+      expect(result.url).toBe('https://carddav.example.com/addressbooks/default/test.vcf');
+      expect(result.etag).toBe('updated-etag');
+    });
+
+    it('should throw when existing vCard cannot be fetched', async () => {
+      const mockClient = {
+        fetchAddressBooks: vi.fn(),
+        fetchVCards: vi.fn(),
+        fetchVCard: vi.fn().mockResolvedValue(null),
+        createVCard: vi.fn(),
+        updateVCard: vi.fn(),
+        deleteVCard: vi.fn(),
+      };
+
+      const addressBook = {
+        url: 'https://carddav.example.com/addressbooks/default/',
+        displayName: 'Contacts',
+        raw: {},
+      };
+
+      await expect(
+        createOrAdoptVCard(mockClient, addressBook as unknown as AddressBook, 'data', 'missing.vcf', 'person-1')
+      ).rejects.toThrow('412 recovery failed');
+    });
+
+    it('should handle address book URL without trailing slash', async () => {
+      const mockClient = {
+        fetchAddressBooks: vi.fn(),
+        fetchVCards: vi.fn(),
+        fetchVCard: vi.fn().mockResolvedValue({
+          url: 'https://carddav.example.com/addressbooks/default/test.vcf',
+          etag: 'etag-1',
+          data: '',
+        }),
+        createVCard: vi.fn(),
+        updateVCard: vi.fn().mockResolvedValue({
+          url: 'https://carddav.example.com/addressbooks/default/test.vcf',
+          etag: 'etag-2',
+          data: '',
+        }),
+        deleteVCard: vi.fn(),
+      };
+
+      const addressBook = {
+        url: 'https://carddav.example.com/addressbooks/default', // no trailing slash
+        displayName: 'Contacts',
+        raw: {},
+      };
+
+      await createOrAdoptVCard(
+        mockClient,
+        addressBook as unknown as AddressBook,
+        'data',
+        'test.vcf',
+        'person-1',
+      );
+
+      // Should construct URL with slash separator
+      expect(mockClient.fetchVCard).toHaveBeenCalledWith(
+        addressBook,
+        'https://carddav.example.com/addressbooks/default/test.vcf',
+      );
+    });
+  });
+
+  describe('412 recovery in syncToServer', () => {
+    function makePendingMapping(overrides: Record<string, unknown> = {}) {
+      return {
+        id: 'mapping-pending',
+        connectionId: CONNECTION_ID,
+        personId: 'person-pending',
+        uid: 'pending-uid',
+        href: 'https://carddav.example.com/contacts/pending-uid.vcf',
+        etag: 'stale-etag',
+        syncStatus: 'pending',
+        lastSyncedAt: new Date('2025-01-01'),
+        lastLocalChange: new Date('2025-02-01'),
+        lastRemoteChange: null,
+        localVersion: null,
+        remoteVersion: null,
+        preservedProperties: null,
+        person: {
+          id: 'person-pending',
+          userId: USER_ID,
+          name: 'Test',
+          surname: 'Person',
+          uid: 'pending-uid',
+          photo: null,
+          notes: null,
+          phoneNumbers: [],
+          emails: [],
+          addresses: [],
+          urls: [],
+          imHandles: [],
+          locations: [],
+          customFields: [],
+          importantDates: [],
+          relationshipsFrom: [],
+          groups: [],
+        },
+        ...overrides,
+      };
+    }
+
+    it('should recover from 412 on UPDATE by fetching fresh ETag', async () => {
+      const mapping = makePendingMapping();
+
+      // First call: pending mappings; second call: mapped person IDs
+      mocks.cardDavMappingFindMany
+        .mockResolvedValueOnce([mapping])
+        .mockResolvedValueOnce([{ personId: mapping.personId }]);
+      mocks.personFindMany.mockResolvedValue([]);
+
+      // First updateVCard throws 412, second succeeds
+      mocks.updateVCard
+        .mockRejectedValueOnce(new Error('CardDAV UPDATE failed: 412 Precondition Failed'))
+        .mockResolvedValueOnce({
+          url: mapping.href,
+          etag: 'fresh-etag-after-retry',
+          data: 'updated-data',
+        });
+
+      // fetchVCard returns fresh ETag
+      mocks.fetchVCard.mockResolvedValue({
+        url: mapping.href,
+        etag: 'fresh-server-etag',
+        data: 'server-data',
+      });
+
+      const result = await syncToServer(USER_ID);
+
+      // Should have called fetchVCard to get fresh ETag
+      expect(mocks.fetchVCard).toHaveBeenCalledWith(
+        expect.anything(),
+        mapping.href,
+      );
+
+      // Should have retried updateVCard with fresh ETag
+      expect(mocks.updateVCard).toHaveBeenCalledTimes(2);
+      expect(result.updatedRemotely).toBe(1);
+      expect(result.errors).toBe(0);
+    });
+
+    it('should recover from 412 on CREATE (mapped, no href) by adopting server vCard', async () => {
+      const mapping = makePendingMapping({ href: null }); // No href → CREATE path
+
+      mocks.cardDavMappingFindMany
+        .mockResolvedValueOnce([mapping])
+        .mockResolvedValueOnce([{ personId: mapping.personId }]);
+      mocks.personFindMany.mockResolvedValue([]);
+
+      // CREATE throws 412
+      mocks.createVCard.mockRejectedValueOnce(
+        new Error('CardDAV CREATE failed: 412 Precondition Failed')
+      );
+
+      // fetchVCard finds the existing server vCard
+      mocks.fetchVCard.mockResolvedValue({
+        url: 'https://carddav.example.com/addressbooks/default/pending-uid.vcf',
+        etag: 'server-existing-etag',
+        data: 'server-data',
+      });
+
+      // updateVCard succeeds (adopting the existing vCard)
+      mocks.updateVCard.mockResolvedValue({
+        url: 'https://carddav.example.com/addressbooks/default/pending-uid.vcf',
+        etag: 'adopted-etag',
+        data: 'updated-data',
+      });
+
+      const result = await syncToServer(USER_ID);
+
+      expect(mocks.fetchVCard).toHaveBeenCalled();
+      expect(mocks.updateVCard).toHaveBeenCalled();
+      expect(result.exported).toBe(1);
+      expect(result.errors).toBe(0);
+    });
+
+    it('should recover from 412 on CREATE (unmapped person) by adopting server vCard', async () => {
+      // No pending mappings
+      mocks.cardDavMappingFindMany
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]);
+
+      const unmappedPerson = {
+        id: 'person-unmapped',
+        userId: USER_ID,
+        name: 'Unmapped',
+        surname: 'Contact',
+        uid: 'unmapped-uid',
+        photo: null,
+        phoneNumbers: [],
+        emails: [],
+        addresses: [],
+        urls: [],
+        imHandles: [],
+        locations: [],
+        customFields: [],
+        importantDates: [],
+        relationshipsFrom: [],
+        groups: [],
+      };
+      mocks.personFindMany.mockResolvedValue([unmappedPerson]);
+
+      // CREATE throws 412
+      mocks.createVCard.mockRejectedValueOnce(
+        new Error('CardDAV CREATE failed: 412 Precondition Failed')
+      );
+
+      // fetchVCard finds existing server vCard
+      mocks.fetchVCard.mockResolvedValue({
+        url: 'https://carddav.example.com/addressbooks/default/unmapped-uid.vcf',
+        etag: 'existing-etag',
+        data: 'old-data',
+      });
+
+      // updateVCard succeeds
+      mocks.updateVCard.mockResolvedValue({
+        url: 'https://carddav.example.com/addressbooks/default/unmapped-uid.vcf',
+        etag: 'adopted-etag',
+        data: 'new-data',
+      });
+
+      const result = await syncToServer(USER_ID);
+
+      expect(mocks.fetchVCard).toHaveBeenCalled();
+      expect(mocks.updateVCard).toHaveBeenCalled();
+      expect(mocks.cardDavMappingCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            personId: 'person-unmapped',
+            href: 'https://carddav.example.com/addressbooks/default/unmapped-uid.vcf',
+            etag: 'adopted-etag',
+          }),
+        })
+      );
+      expect(result.exported).toBe(1);
+      expect(result.errors).toBe(0);
+    });
+
+    it('should not catch non-412 errors during UPDATE', async () => {
+      const mapping = makePendingMapping();
+
+      mocks.cardDavMappingFindMany
+        .mockResolvedValueOnce([mapping])
+        .mockResolvedValueOnce([{ personId: mapping.personId }]);
+      mocks.personFindMany.mockResolvedValue([]);
+
+      // UPDATE throws 500 (not 412)
+      mocks.updateVCard.mockRejectedValueOnce(
+        new Error('CardDAV UPDATE failed: 500 Internal Server Error')
+      );
+
+      const result = await syncToServer(USER_ID);
+
+      // Should NOT attempt fetchVCard recovery
+      expect(mocks.fetchVCard).not.toHaveBeenCalled();
+      expect(result.errors).toBe(1);
+      expect(result.updatedRemotely).toBe(0);
+    });
+
+    it('should not catch non-412 errors during CREATE', async () => {
+      mocks.cardDavMappingFindMany
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]);
+
+      const unmappedPerson = {
+        id: 'person-err',
+        userId: USER_ID,
+        name: 'Error',
+        surname: 'Person',
+        uid: 'err-uid',
+        photo: null,
+        phoneNumbers: [],
+        emails: [],
+        addresses: [],
+        urls: [],
+        imHandles: [],
+        locations: [],
+        customFields: [],
+        importantDates: [],
+        relationshipsFrom: [],
+        groups: [],
+      };
+      mocks.personFindMany.mockResolvedValue([unmappedPerson]);
+
+      // CREATE throws 403 (not 412)
+      mocks.createVCard.mockRejectedValueOnce(
+        new Error('CardDAV CREATE failed: 403 Forbidden')
+      );
+
+      const result = await syncToServer(USER_ID);
+
+      expect(mocks.fetchVCard).not.toHaveBeenCalled();
+      expect(result.errors).toBe(1);
+      expect(result.exported).toBe(0);
     });
   });
 

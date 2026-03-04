@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
-import { createCardDavClient, VCard } from './client';
+import { createCardDavClient, AddressBook, CardDavClientInterface, VCard } from './client';
 import { personToVCard, vCardToPerson } from '@/lib/vcard';
 import { parseVCard } from '@/lib/carddav/vcard-parser';
+import type { UnknownProperty } from '@/lib/carddav/vcard-parser';
 import { withRetry, categorizeError } from './retry';
 import { readPhotoForExport, isPhotoFilename } from '@/lib/photo-storage';
 import { updatePersonFromVCard } from './person-from-vcard';
@@ -11,6 +12,52 @@ import { buildLocalHash } from './hash';
 import { createModuleLogger } from '@/lib/logger';
 
 const log = createModuleLogger('carddav');
+
+/** Preserved vCard properties stored on CardDavMapping for round-tripping. */
+export type PreservedProperties = UnknownProperty[];
+
+/**
+ * Check whether an error represents an HTTP 412 Precondition Failed response.
+ * Checks for a numeric `status` property first (structured errors), then
+ * falls back to matching the "412" status code in the error message (tsdav
+ * wraps HTTP failures as plain Error objects with the status in the message).
+ */
+export function is412Error(error: unknown): boolean {
+  if (typeof error === 'object' && error !== null && 'status' in error) {
+    return (error as { status: number }).status === 412;
+  }
+  return error instanceof Error && /\b412\b/.test(error.message);
+}
+
+/**
+ * Handle a 412 Precondition Failed on vCard CREATE by adopting the existing
+ * server-side vCard and updating it instead.
+ *
+ * When a CREATE returns 412, the vCard already exists on the server (e.g.,
+ * same UID was imported but not mapped). We fetch the existing vCard to get
+ * its current ETag/href and then update it with our data.
+ */
+export async function createOrAdoptVCard(
+  client: CardDavClientInterface,
+  addressBook: AddressBook,
+  vCardData: string,
+  filename: string,
+  personId: string,
+): Promise<VCard> {
+  const expectedUrl = addressBook.url.endsWith('/')
+    ? `${addressBook.url}${filename}`
+    : `${addressBook.url}/${filename}`;
+  const existing = await client.fetchVCard(addressBook, expectedUrl);
+  if (!existing) {
+    throw new Error(`412 recovery failed: could not fetch existing vCard at ${expectedUrl}`);
+  }
+  log.info({ personId, filename }, '412 on CREATE — adopting existing server vCard');
+  const updated = await client.updateVCard(
+    { url: existing.url, etag: existing.etag, data: '' },
+    vCardData,
+  );
+  return { url: existing.url, etag: updated.etag, data: vCardData };
+}
 
 /**
  * Acquire a sync lock for a user. Returns true if lock was acquired.
@@ -506,7 +553,7 @@ export async function syncToServer(
           if (loaded) photoDataUri = loaded;
         }
 
-        const preservedProps = mapping.preservedProperties as Array<{ key: string; value: string; group?: string; params: Record<string, string | string[]> }> | null;
+        const preservedProps = mapping.preservedProperties as PreservedProperties | null;
         const vCardData = personToVCard(personWithAllRelations, {
           photoDataUri,
           preservedProperties: preservedProps || undefined,
@@ -529,8 +576,7 @@ export async function syncToServer(
               { maxAttempts: 3 }
             );
           } catch (updateError) {
-            const is412 = updateError instanceof Error && updateError.message.includes('412');
-            if (!is412) throw updateError;
+            if (!is412Error(updateError)) throw updateError;
 
             // 412: fetch fresh ETag from server and retry once
             log.warn({ personId: mapping.personId, href: mapping.href }, '412 Precondition Failed — refreshing ETag and retrying');
@@ -564,22 +610,8 @@ export async function syncToServer(
               { maxAttempts: 3 }
             );
           } catch (createError) {
-            const is412 = createError instanceof Error && createError.message.includes('412');
-            if (!is412) throw createError;
-
-            log.warn({ personId: mapping.personId, filename }, '412 on CREATE — vCard already exists on server, updating instead');
-            const expectedUrl = addressBook.url.endsWith('/')
-              ? `${addressBook.url}${filename}`
-              : `${addressBook.url}/${filename}`;
-            const existing = await client.fetchVCard(addressBook, expectedUrl);
-            if (!existing) {
-              throw new Error(`412 recovery failed: could not fetch existing vCard at ${expectedUrl}`);
-            }
-            const updated = await client.updateVCard(
-              { url: existing.url, etag: existing.etag, data: '' },
-              vCardData
-            );
-            created = { url: existing.url, etag: updated.etag, data: vCardData };
+            if (!is412Error(createError)) throw createError;
+            created = await createOrAdoptVCard(client, addressBook, vCardData, filename, mapping.personId);
           }
 
           await prisma.cardDavMapping.update({
@@ -689,22 +721,8 @@ export async function syncToServer(
             { maxAttempts: 3 }
           );
         } catch (createError) {
-          const is412 = createError instanceof Error && createError.message.includes('412');
-          if (!is412) throw createError;
-
-          log.warn({ personId: person.id, filename }, '412 on CREATE — vCard already exists on server, updating instead');
-          const expectedUrl = addressBook.url.endsWith('/')
-            ? `${addressBook.url}${filename}`
-            : `${addressBook.url}/${filename}`;
-          const existing = await client.fetchVCard(addressBook, expectedUrl);
-          if (!existing) {
-            throw new Error(`412 recovery failed: could not fetch existing vCard at ${expectedUrl}`);
-          }
-          const updated = await client.updateVCard(
-            { url: existing.url, etag: existing.etag, data: '' },
-            vCardData
-          );
-          created = { url: existing.url, etag: updated.etag, data: vCardData };
+          if (!is412Error(createError)) throw createError;
+          created = await createOrAdoptVCard(client, addressBook, vCardData, filename, person.id);
         }
 
         // Create mapping
