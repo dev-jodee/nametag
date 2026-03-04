@@ -353,7 +353,7 @@ export default async function PersonDetailsPage({
                       personId={person.id}
                       name={formatFullName(person)}
                       photo={person.photo}
-                      size={128}
+                      size={80}
                       loading="eager"
                     />
                   </div>
