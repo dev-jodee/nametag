@@ -32,23 +32,12 @@ export const GET = withAuth(async (_request, session, context) => {
       return new NextResponse(null, { status: 404 });
     }
 
-    // ETag from content length + first 32 bytes (fast, avoids hashing entire file)
-    const prefix = result.buffer.subarray(0, 32).toString('base64url');
-    const etag = `"${result.buffer.length}-${prefix}"`;
-
-    // Return 304 if client has current version
-    const ifNoneMatch = _request.headers.get('if-none-match');
-    if (ifNoneMatch === etag) {
-      return new NextResponse(null, { status: 304 });
-    }
-
     return new NextResponse(new Uint8Array(result.buffer), {
       status: 200,
       headers: {
         'Content-Type': result.mimeType,
         'Content-Length': String(result.buffer.length),
-        'Cache-Control': 'private, no-cache',
-        'ETag': etag,
+        'Cache-Control': 'private, no-store',
       },
     });
   } catch {
