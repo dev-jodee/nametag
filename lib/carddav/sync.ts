@@ -553,12 +553,34 @@ export async function syncToServer(
 
           result.updatedRemotely++;
         } else {
-          // Create new vCard with retry
+          // Create new vCard with retry.
+          // On 412, the vCard already exists on the server (e.g., same UID) —
+          // fetch it to get the current ETag/href and update instead.
           const filename = `${mapping.uid || uuidv4()}.vcf`;
-          const created = await withRetry(
-            () => client.createVCard(addressBook, vCardData, filename),
-            { maxAttempts: 3 }
-          );
+          let created: VCard;
+          try {
+            created = await withRetry(
+              () => client.createVCard(addressBook, vCardData, filename),
+              { maxAttempts: 3 }
+            );
+          } catch (createError) {
+            const is412 = createError instanceof Error && createError.message.includes('412');
+            if (!is412) throw createError;
+
+            log.warn({ personId: mapping.personId, filename }, '412 on CREATE — vCard already exists on server, updating instead');
+            const expectedUrl = addressBook.url.endsWith('/')
+              ? `${addressBook.url}${filename}`
+              : `${addressBook.url}/${filename}`;
+            const existing = await client.fetchVCard(addressBook, expectedUrl);
+            if (!existing) {
+              throw new Error(`412 recovery failed: could not fetch existing vCard at ${expectedUrl}`);
+            }
+            const updated = await client.updateVCard(
+              { url: existing.url, etag: existing.etag, data: '' },
+              vCardData
+            );
+            created = { url: existing.url, etag: updated.etag, data: vCardData };
+          }
 
           await prisma.cardDavMapping.update({
             where: { id: mapping.id },
@@ -658,10 +680,32 @@ export async function syncToServer(
         const vCardData = personToVCard(person, { photoDataUri: unmappedPhotoDataUri });
         const filename = `${uid}.vcf`;
 
-        const created = await withRetry(
-          () => client.createVCard(addressBook, vCardData, filename),
-          { maxAttempts: 3 }
-        );
+        // Create vCard on server. On 412, the vCard already exists (e.g., same UID
+        // was imported from server but not yet mapped) — adopt it and update instead.
+        let created: VCard;
+        try {
+          created = await withRetry(
+            () => client.createVCard(addressBook, vCardData, filename),
+            { maxAttempts: 3 }
+          );
+        } catch (createError) {
+          const is412 = createError instanceof Error && createError.message.includes('412');
+          if (!is412) throw createError;
+
+          log.warn({ personId: person.id, filename }, '412 on CREATE — vCard already exists on server, updating instead');
+          const expectedUrl = addressBook.url.endsWith('/')
+            ? `${addressBook.url}${filename}`
+            : `${addressBook.url}/${filename}`;
+          const existing = await client.fetchVCard(addressBook, expectedUrl);
+          if (!existing) {
+            throw new Error(`412 recovery failed: could not fetch existing vCard at ${expectedUrl}`);
+          }
+          const updated = await client.updateVCard(
+            { url: existing.url, etag: existing.etag, data: '' },
+            vCardData
+          );
+          created = { url: existing.url, etag: updated.etag, data: vCardData };
+        }
 
         // Create mapping
         await prisma.cardDavMapping.create({
