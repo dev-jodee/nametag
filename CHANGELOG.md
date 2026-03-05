@@ -6,6 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.31.0](https://github.com/mattogodoy/nametag/compare/v0.30.0...v0.31.0) (2026-03-05)
+
+
+### Features
+
+* add person photo upload, crop, and display ([0488109](https://github.com/mattogodoy/nametag/commit/0488109e9060fd383e1dab41b381ccc7e4a90380))
+* add photo feature translations for all locales ([370beb7](https://github.com/mattogodoy/nametag/commit/370beb77f94f4c69ebebc4332c78893c80e8aa4e))
+* add photo upload and delete API endpoints ([8578d6c](https://github.com/mattogodoy/nametag/commit/8578d6cb1ab6fd7ca806e4129ae9d2529c7fa3f0))
+* add PhotoCropModal with react-easy-crop integration ([8b90edf](https://github.com/mattogodoy/nametag/commit/8b90edf55ee8b1f95a1dfa9dd4595af081681c53))
+* add processPhoto utility with sharp resize/JPEG/EXIF-strip ([ec3bc8f](https://github.com/mattogodoy/nametag/commit/ec3bc8f3c2eacb74d608b5c49f0ee330bf44bdbc))
+* add sharp and react-easy-crop dependencies for photo upload ([d6e92ce](https://github.com/mattogodoy/nametag/commit/d6e92cebbfcbbc664b7fcd0bbee232ee5b86e2ce))
+* add user photo support (upload, navbar, graph, relationships) ([341b292](https://github.com/mattogodoy/nametag/commit/341b292633be86ad6b9b8c695cdaadbaf7af7776))
+* embed person photos in reminder emails as inline CID attachments ([7b5d825](https://github.com/mattogodoy/nametag/commit/7b5d825a7bdd0ecea57795b3f9a5269ba4322c3a))
+* increase max crop zoom from 3x to 5x ([6585fb9](https://github.com/mattogodoy/nametag/commit/6585fb91a3fc47344ff37f75cb890b3fd75a92ee))
+* integrate photo upload and crop into PersonForm ([f9be2fe](https://github.com/mattogodoy/nametag/commit/f9be2fe5f643d2316be50c717e4a43fa8b2fedd5))
+* replace PersonPhoto with flexible PersonAvatar component ([7dfa914](https://github.com/mattogodoy/nametag/commit/7dfa914206bc97584e20f4d159d0320a9bf117fd))
+* show person photos in dashboard upcoming events ([1cb9f81](https://github.com/mattogodoy/nametag/commit/1cb9f81132adab2eed62b460470bc0cdb9103002))
+* show person photos in group member pills ([11baa8b](https://github.com/mattogodoy/nametag/commit/11baa8b8849294e5296cba6cbc815865269b2f66))
+* show person photos in navbar search results ([0bebd71](https://github.com/mattogodoy/nametag/commit/0bebd71122221a0c45a3ef147c0a479a83df4f4f))
+* show person photos in network graph nodes with group-colored borders ([80dc1e2](https://github.com/mattogodoy/nametag/commit/80dc1e267e59a76153c79a1d2b748a3356a2a739))
+* show person photos in people list table ([7205680](https://github.com/mattogodoy/nametag/commit/7205680145c12ad7999feabc9daa2c61ae6cf24b))
+* show person photos in relationship list ([c41d36c](https://github.com/mattogodoy/nametag/commit/c41d36cf48bc7afd216ce43814fa6615f456aaa2))
+
+
+### Bug Fixes
+
+* add blob: to CSP img-src for photo crop preview ([9922210](https://github.com/mattogodoy/nametag/commit/992221006aea549788721ab33d138da90f8ef989))
+* defer photo upload/delete to form save instead of immediate execution ([9a9f81b](https://github.com/mattogodoy/nametag/commit/9a9f81baf3e012724a52ed98731a35248b242eea))
+* remove inline photo attachments from reminder emails ([5a8bbd0](https://github.com/mattogodoy/nametag/commit/5a8bbd098968c1f35ee3f8be4e2a4a73d3c988a2))
+* set maxZoom=5 on Cropper component to match slider range ([0be7969](https://github.com/mattogodoy/nametag/commit/0be7969b48624eca01984be84678fe1e93dbfcdb))
+* strip quoted nicknames from initials in PersonAvatar ([9e32f67](https://github.com/mattogodoy/nametag/commit/9e32f67143a9742fc3eb5aa1d8ef526ec6de7d58))
+* update UI immediately when removing a photo via X button ([9f6c2ee](https://github.com/mattogodoy/nametag/commit/9f6c2ee0f84dd442411c7476a6b78a17f9fdf584))
+* use 80px avatar on person detail page per design spec ([8600af9](https://github.com/mattogodoy/nametag/commit/8600af96342fbd63687ceac9c27669c30541ced7))
+* use ETag + no-cache for photo serving to prevent stale cache on photo change ([39829d3](https://github.com/mattogodoy/nametag/commit/39829d36d7891e8349f410b49f1315cfcbf1776c))
+* use no-store for photo serving to guarantee fresh photos after change ([a6a42d3](https://github.com/mattogodoy/nametag/commit/a6a42d36b3d622b9ddd08f320027e12eab188699))
+
 ## [0.30.0](https://github.com/mattogodoy/nametag/compare/v0.29.0...v0.30.0) (2026-03-04)
 
 
