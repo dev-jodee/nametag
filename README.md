@@ -433,7 +433,6 @@ Future features and improvements, ordered by priority:
 - [ ] Add support for SQLite databases
 - [ ] Implement OIDC [[Issue #10](https://github.com/mattogodoy/nametag/issues/10)]
 - [ ] Add notification support [[Issue #6](https://github.com/mattogodoy/nametag/issues/6)]
-- [ ] Add photos to contacts [[Issue #19](https://github.com/mattogodoy/nametag/issues/19)]
 - [ ] Add custom template titles for important dates [[Issue #23](https://github.com/mattogodoy/nametag/issues/23)]
 - [ ] Add map to show people's locations [[Issue #26](https://github.com/mattogodoy/nametag/issues/26)]
 - [ ] Support multi-user groups [[Issue #37](https://github.com/mattogodoy/nametag/issues/37)]
@@ -449,9 +448,10 @@ Features and improvements that have already been implemented:
 - [x] ~~SMTP support~~ [[Issue #4](https://github.com/mattogodoy/nametag/issues/4), [PR #21](https://github.com/mattogodoy/nametag/pull/21)]
 - [x] ~~Option to disable registration~~ [[Issue #9](https://github.com/mattogodoy/nametag/issues/9), [PR #17](https://github.com/mattogodoy/nametag/pull/17)]
 - [x] ~~ARM build for docker images~~ [[Issue #14](https://github.com/mattogodoy/nametag/issues/14), [PR #18](https://github.com/mattogodoy/nametag/pull/18)]
-- [x] Improve development setup to make contributors' lives easier [[PR #25](https://github.com/mattogodoy/nametag/pull/25)]
-- [x] Implement CardDAV support [[Issue #15](https://github.com/mattogodoy/nametag/issues/15), [PR #82](https://github.com/mattogodoy/nametag/pull/82)]
-- [x] API for third-party integrations [[Issue #29](https://github.com/mattogodoy/nametag/issues/29), [PR #70](https://github.com/mattogodoy/nametag/pull/70)]
+- [x] ~~Improve development setup to make contributors' lives easier~~ [[PR #25](https://github.com/mattogodoy/nametag/pull/25)]
+- [x] ~~Implement CardDAV support~~ [[Issue #15](https://github.com/mattogodoy/nametag/issues/15), [PR #82](https://github.com/mattogodoy/nametag/pull/82)]
+- [x] ~~API for third-party integrations~~ [[Issue #29](https://github.com/mattogodoy/nametag/issues/29), [PR #70](https://github.com/mattogodoy/nametag/pull/70)]
+- [ ] ~~Add photos to people~~ [[Issue #19](https://github.com/mattogodoy/nametag/issues/19)]
 
 ## License
 
