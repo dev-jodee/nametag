@@ -60,40 +60,44 @@ export const POST = withLogging(async function POST(request: Request) {
         defaultAccountType: 'carddav',
       });
 
-      // Fetch address books to verify connection AND return the list.
-      // Pass custom props to include addressbook-description, which tsdav
-      // doesn't request by default.
-      const addressBooks = await client.fetchAddressBooks({
-        props: {
-          'd:displayname': {},
-          'cs:getctag': {},
-          'd:resourcetype': {},
-          'd:sync-token': {},
-          'card:addressbook-description': {},
-        },
-      });
+      // Fetch address books to verify connection
+      const addressBooks = await client.fetchAddressBooks();
 
-      // Count contacts per address book in parallel using lightweight PROPFIND
-      // (requests only getetag, no vCard data downloaded)
+      // For each address book, do a lightweight PROPFIND (depth 1) requesting
+      // only getetag and addressbook-description. This gives us:
+      // - Contact count: number of child resources with an etag
+      // - Description: from the collection resource itself (first response)
+      // tsdav's fetchAddressBooks doesn't expose the description, so we read it
+      // from the raw PROPFIND response.
       const addressBooksWithCounts = await Promise.all(
         addressBooks.map(async (ab) => {
           const absoluteUrl = /^https?:\/\//i.test(ab.url) ? ab.url : new URL(ab.url, serverUrl).href;
           let contactCount: number | null = null;
+          let description: string | null = null;
           try {
             const resources = await client.propfind({
               url: absoluteUrl,
-              props: { 'd:getetag': {} },
+              props: {
+                'd:getetag': {},
+                'card:addressbook-description': {},
+              },
               depth: '1',
             });
             // First response is the collection itself; the rest are vCard resources
             contactCount = Math.max(0, resources.length - 1);
+            // Read description from the collection resource (first response)
+            const collectionProps = resources[0]?.props as Record<string, unknown> | undefined;
+            const rawDesc = collectionProps?.addressbookDescription;
+            if (typeof rawDesc === 'string' && rawDesc.trim()) {
+              description = rawDesc.trim();
+            }
           } catch (err) {
             log.warn({ err: err instanceof Error ? err : new Error(String(err)), url: absoluteUrl }, 'Failed to count contacts in address book');
           }
           return {
             url: absoluteUrl,
             displayName: typeof ab.displayName === 'string' ? ab.displayName : null,
-            description: ab.description || null,
+            description,
             contactCount,
           };
         })
