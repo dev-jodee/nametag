@@ -18,6 +18,8 @@ const connectionSchema = z.object({
   autoExportNew: z.boolean().optional(),
   autoSyncInterval: z.number().int().min(60).max(86400).optional(), // 1 min to 24 hours
   importMode: z.enum(['manual', 'notify', 'auto']).optional(),
+  addressBookUrl: z.string().url().optional(),
+  addressBookName: z.string().optional(),
 });
 
 const updateConnectionSchema = z.object({
@@ -58,6 +60,8 @@ export const POST = withLogging(async function POST(request: Request) {
       autoExportNew,
       autoSyncInterval,
       importMode,
+      addressBookUrl,
+      addressBookName,
     } = validationResult.data;
 
     // Validate URL to prevent SSRF attacks
@@ -104,6 +108,8 @@ export const POST = withLogging(async function POST(request: Request) {
         autoExportNew: autoExportNew ?? true,
         autoSyncInterval: autoSyncInterval ?? 43200, // Default: 12 hours
         importMode: importMode ?? 'manual', // Default: manual
+        addressBookUrl: addressBookUrl || null,
+        addressBookName: addressBookName || null,
       },
     });
 
