@@ -15,7 +15,7 @@ const ITEMS_PER_PAGE = 50;
 export default async function PeoplePage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; sortBy?: string; order?: string }>;
+  searchParams: Promise<{ page?: string; sortBy?: string; order?: string; group?: string }>;
 }) {
   const session = await auth();
   const t = await getTranslations('people');
@@ -39,14 +39,28 @@ export default async function PeoplePage({
   const currentPage = Number(params.page) || 1;
   const sortBy = params.sortBy || 'name';
   const order = params.order || 'asc';
+  const groupFilter = params.group || '';
   const skip = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  // Build where clause for people query
+  const peopleWhere: {
+    userId: string;
+    deletedAt: null;
+    groups?: { none: Record<string, never> } | { some: { groupId: string } };
+  } = {
+    userId: session.user.id,
+    deletedAt: null,
+  };
+
+  if (groupFilter === 'none') {
+    peopleWhere.groups = { none: {} };
+  } else if (groupFilter) {
+    peopleWhere.groups = { some: { groupId: groupFilter } };
+  }
 
   // Get total count for pagination
   const totalCount = await prisma.person.count({
-    where: {
-      userId: session.user.id,
-      deletedAt: null,
-    },
+    where: peopleWhere,
   });
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
@@ -54,7 +68,7 @@ export default async function PeoplePage({
   // Fetch all people, groups, and relationship types in parallel
   const [allPeople, allGroups, relationshipTypes] = await Promise.all([
     prisma.person.findMany({
-      where: { userId: session.user.id, deletedAt: null },
+      where: peopleWhere,
       include: {
         relationshipToUser: { select: { label: true, color: true } },
         groups: { include: { group: { select: { name: true, color: true } } } },
@@ -209,6 +223,7 @@ export default async function PeoplePage({
                 totalPages={totalPages}
                 sortBy={sortBy}
                 order={order}
+                groupFilter={groupFilter}
                 dateFormat={dateFormat}
                 availableGroups={allGroups}
                 relationshipTypes={relationshipTypes}

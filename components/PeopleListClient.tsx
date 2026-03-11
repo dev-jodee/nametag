@@ -46,6 +46,7 @@ interface PeopleListClientProps {
   totalPages: number;
   sortBy: string;
   order: string;
+  groupFilter: string;
   dateFormat: DateFormat;
   availableGroups: Group[];
   relationshipTypes: RelationshipType[];
@@ -78,6 +79,7 @@ export default function PeopleListClient({
   totalPages,
   sortBy,
   order,
+  groupFilter,
   dateFormat,
   availableGroups,
   relationshipTypes,
@@ -85,6 +87,7 @@ export default function PeopleListClient({
   commonTranslations: tc,
 }: PeopleListClientProps) {
   const t = useTranslations('people.bulk');
+  const tPeople = useTranslations('people');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -185,6 +188,7 @@ export default function PeopleListClient({
     params.set('sortBy', col);
     params.set('order', sortBy === col && order === 'asc' ? 'desc' : 'asc');
     params.set('page', String(currentPage));
+    if (groupFilter) params.set('group', groupFilter);
     return `/people?${params.toString()}`;
   };
 
@@ -193,14 +197,37 @@ export default function PeopleListClient({
     params.set('page', page.toString());
     if (sortBy !== 'name') params.set('sortBy', sortBy);
     if (order !== 'asc') params.set('order', order);
+    if (groupFilter) params.set('group', groupFilter);
     return `/people?${params.toString()}`;
+  };
+
+  const handleGroupFilterChange = (value: string) => {
+    const params = new URLSearchParams();
+    if (sortBy !== 'name') params.set('sortBy', sortBy);
+    if (order !== 'asc') params.set('order', order);
+    if (value) params.set('group', value);
+    params.set('page', '1');
+    router.push(`/people?${params.toString()}`);
   };
 
   return (
     <>
-      {/* Showing count */}
-      <div className="mb-4 text-sm text-muted">
-        {tt.showing}
+      {/* Showing count and group filter */}
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-sm text-muted">
+          {tt.showing}
+        </span>
+        <select
+          value={groupFilter}
+          onChange={(e) => handleGroupFilterChange(e.target.value)}
+          className="px-3 py-1.5 text-sm border border-border rounded-lg bg-surface-elevated text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+        >
+          <option value="">{tPeople('allGroups')}</option>
+          <option value="none">{tPeople('noGroup')}</option>
+          {availableGroups.map((g) => (
+            <option key={g.id} value={g.id}>{g.name}</option>
+          ))}
+        </select>
       </div>
 
       {/* Table */}
