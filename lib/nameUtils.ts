@@ -1,37 +1,34 @@
 /**
  * Formats a person's name with optional nickname and all name parts
- * Format: "Name 'Nickname' MiddleName Surname SecondLastName"
- * Examples:
- * - "John Smith" (no nickname, no middle names)
- * - "Charles 'Charlie' Brown" (with nickname)
- * - "John" (only name)
- * - "Matias Alejandro Godoy Biedma" (with middle name and second last name)
+ * Western format: "Name 'Nickname' MiddleName Surname SecondLastName"
+ * Eastern format: "Surname SecondLastName 'Nickname' Name MiddleName"
  */
 export function formatPersonName(
   name: string,
   surname?: string | null,
   middleName?: string | null,
   secondLastName?: string | null,
-  nickname?: string | null
+  nickname?: string | null,
+  nameOrder?: 'WESTERN' | 'EASTERN'
 ): string {
+  const nicknameStr = nickname ? `'${nickname}'` : null;
+
+  if (nameOrder === 'EASTERN') {
+    const parts: string[] = [];
+    if (surname) parts.push(surname);
+    if (secondLastName) parts.push(secondLastName);
+    if (nicknameStr) parts.push(nicknameStr);
+    parts.push(name);
+    if (middleName) parts.push(middleName);
+    return parts.join(' ');
+  }
+
+  // Western order (default)
   const parts: string[] = [name];
-
-  if (nickname) {
-    parts.push(`'${nickname}'`);
-  }
-
-  if (middleName) {
-    parts.push(middleName);
-  }
-
-  if (surname) {
-    parts.push(surname);
-  }
-
-  if (secondLastName) {
-    parts.push(secondLastName);
-  }
-
+  if (nicknameStr) parts.push(nicknameStr);
+  if (middleName) parts.push(middleName);
+  if (surname) parts.push(surname);
+  if (secondLastName) parts.push(secondLastName);
   return parts.join(' ');
 }
 
@@ -45,13 +42,14 @@ export function formatFullName(person: {
   middleName?: string | null;
   secondLastName?: string | null;
   nickname?: string | null;
-}): string {
+}, nameOrder?: 'WESTERN' | 'EASTERN'): string {
   return formatPersonName(
     person.name,
     person.surname,
     person.middleName,
     person.secondLastName,
-    person.nickname
+    person.nickname,
+    nameOrder
   );
 }
 
@@ -59,16 +57,19 @@ export function formatFullName(person: {
  * Formats a person's name for display in network graphs
  * Shows only nickname (if present) or first name, plus surname
  * This keeps graph node labels concise and readable
- * Examples:
- * - "Matias Alejandro Godoy Biedma" → "Matias Godoy"
- * - "Matias 'Matto' Alejandro Godoy Biedma" → "Matto Godoy"
- * - "John" → "John"
  */
 export function formatGraphName(person: {
   name: string;
   surname?: string | null;
   nickname?: string | null;
-}): string {
+}, nameOrder?: 'WESTERN' | 'EASTERN'): string {
   const displayName = person.nickname || person.name;
-  return person.surname ? `${displayName} ${person.surname}` : displayName;
+
+  if (!person.surname) return displayName;
+
+  if (nameOrder === 'EASTERN') {
+    return `${person.surname} ${displayName}`;
+  }
+
+  return `${displayName} ${person.surname}`;
 }
