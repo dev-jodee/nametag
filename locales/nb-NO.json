@@ -57,7 +57,8 @@
     "userMenu": {
       "settings": "Innstillinger",
       "signOut": "Logg ut"
-    }
+    },
+    "calendar": "Kalender"
   },
   "settings": {
     "title": "Innstillinger",
@@ -1636,5 +1637,47 @@
     "today": "I dag",
     "yearUnknown": "År ukjent",
     "yearUnknownTooltip": "Når dette er avkrysset, lagres kun måneden og dagen. Året ignoreres."
+  },
+  "calendar": {
+    "title": "Kalender",
+    "prevMonth": "Forrige måned",
+    "nextMonth": "Neste måned",
+    "today": "I dag",
+    "loading": "Laster...",
+    "more": "til",
+    "viewFull": "Vis full kalender",
+    "openCalendar": "Åpne kalender",
+    "months": {
+      "january": "Jan",
+      "february": "Feb",
+      "march": "Mar",
+      "april": "Apr",
+      "may": "Mai",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Aug",
+      "september": "Sep",
+      "october": "Okt",
+      "november": "Nov",
+      "december": "Des"
+    },
+    "days": {
+      "sun": "Søn",
+      "mon": "Man",
+      "tue": "Tir",
+      "wed": "Ons",
+      "thu": "Tor",
+      "fri": "Fre",
+      "sat": "Lør"
+    },
+    "legend": {
+      "birthday": "Bursdag",
+      "anniversary": "Jubileum",
+      "nameday": "Navnedag",
+      "memorial": "Minnedag",
+      "customDate": "Egendefinert dato",
+      "contactReminder": "Kontaktpåminnelse",
+      "lastContact": "Siste kontakt"
+    }
   }
 }

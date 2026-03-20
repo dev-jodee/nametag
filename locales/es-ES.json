@@ -57,7 +57,8 @@
     "userMenu": {
       "settings": "Configuración",
       "signOut": "Cerrar sesión"
-    }
+    },
+    "calendar": "Calendario"
   },
   "settings": {
     "title": "Configuración",
@@ -1636,5 +1637,47 @@
     "today": "Hoy",
     "yearUnknown": "Año desconocido",
     "yearUnknownTooltip": "Cuando está marcado, solo se guardarán el mes y el día. El año será ignorado."
+  },
+  "calendar": {
+    "title": "Calendario",
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "today": "Hoy",
+    "loading": "Cargando...",
+    "more": "más",
+    "viewFull": "Ver calendario completo",
+    "openCalendar": "Abrir calendario",
+    "months": {
+      "january": "Ene",
+      "february": "Feb",
+      "march": "Mar",
+      "april": "Abr",
+      "may": "May",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Ago",
+      "september": "Sep",
+      "october": "Oct",
+      "november": "Nov",
+      "december": "Dic"
+    },
+    "days": {
+      "sun": "Dom",
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb"
+    },
+    "legend": {
+      "birthday": "Cumpleaños",
+      "anniversary": "Aniversario",
+      "nameday": "Día del nombre",
+      "memorial": "Memorial",
+      "customDate": "Fecha personalizada",
+      "contactReminder": "Recordatorio de contacto",
+      "lastContact": "Último contacto"
+    }
   }
 }

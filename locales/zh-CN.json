@@ -57,7 +57,8 @@
     "userMenu": {
       "settings": "设置",
       "signOut": "退出登录"
-    }
+    },
+    "calendar": "日历"
   },
   "settings": {
     "title": "设置",
@@ -1636,5 +1637,47 @@
     "today": "今天",
     "yearUnknown": "年份未知",
     "yearUnknownTooltip": "选中时，仅保存月份和日期。年份将被忽略。"
+  },
+  "calendar": {
+    "title": "日历",
+    "prevMonth": "上个月",
+    "nextMonth": "下个月",
+    "today": "今天",
+    "loading": "加载中...",
+    "more": "更多",
+    "viewFull": "查看完整日历",
+    "openCalendar": "打开日历",
+    "months": {
+      "january": "1月",
+      "february": "2月",
+      "march": "3月",
+      "april": "4月",
+      "may": "5月",
+      "june": "6月",
+      "july": "7月",
+      "august": "8月",
+      "september": "9月",
+      "october": "10月",
+      "november": "11月",
+      "december": "12月"
+    },
+    "days": {
+      "sun": "日",
+      "mon": "一",
+      "tue": "二",
+      "wed": "三",
+      "thu": "四",
+      "fri": "五",
+      "sat": "六"
+    },
+    "legend": {
+      "birthday": "生日",
+      "anniversary": "周年纪念",
+      "nameday": "命名日",
+      "memorial": "纪念日",
+      "customDate": "自定义日期",
+      "contactReminder": "联系提醒",
+      "lastContact": "最近联系"
+    }
   }
 }

@@ -39,6 +39,7 @@ export default function Navigation({ userEmail, userName, userNickname, userPhot
     { href: '/people', labelKey: 'people', createHref: '/people/new', createLabelKey: 'people' },
     { href: '/groups', labelKey: 'groups', createHref: '/groups/new', createLabelKey: 'groups' },
     { href: '/relationship-types', labelKey: 'relationshipTypes', createHref: '/relationship-types/new', createLabelKey: 'relationshipTypes' },
+    { href: '/calendar', labelKey: 'calendar' },
   ];
 
   const isActive = (href: string) => {
