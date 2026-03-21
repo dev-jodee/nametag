@@ -1,6 +1,6 @@
 import { updateEventSchema, validateRequest } from '@/lib/validations';
 import { apiResponse, handleApiError, parseRequestBody, withAuth } from '@/lib/api-utils';
-import { getEvent, updateEvent, deleteEvent } from '@/lib/services/event';
+import { getEvent, updateEvent, deleteEvent, InvalidEventPeopleError } from '@/lib/services/event';
 
 // GET /api/events/[id]
 export const GET = withAuth(async (_request, session, context) => {
@@ -26,6 +26,9 @@ export const PUT = withAuth(async (request, session, context) => {
     if (!event) return apiResponse.notFound('Event not found');
     return apiResponse.ok({ event });
   } catch (error) {
+    if (error instanceof InvalidEventPeopleError) {
+      return apiResponse.error(error.message, 400);
+    }
     return handleApiError(error, 'events-update');
   }
 });

@@ -1,6 +1,6 @@
 import { createEventSchema, validateRequest } from '@/lib/validations';
 import { apiResponse, handleApiError, parseRequestBody, withAuth } from '@/lib/api-utils';
-import { createEvent, getEvents } from '@/lib/services/event';
+import { createEvent, getEvents, InvalidEventPeopleError } from '@/lib/services/event';
 
 // GET /api/events - List all events for the current user
 export const GET = withAuth(async (_request, session) => {
@@ -22,6 +22,9 @@ export const POST = withAuth(async (request, session) => {
     const event = await createEvent(session.user.id, validation.data);
     return apiResponse.created({ event });
   } catch (error) {
+    if (error instanceof InvalidEventPeopleError) {
+      return apiResponse.error(error.message, 400);
+    }
     return handleApiError(error, 'events-create');
   }
 });

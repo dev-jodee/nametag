@@ -26,7 +26,7 @@ export default async function EditEventPage({
       select: { nameOrder: true },
     }),
     prisma.event.findUnique({
-      where: { id, userId: session.user.id },
+      where: { id },
       include: {
         people: {
           where: { deletedAt: null },
@@ -41,7 +41,7 @@ export default async function EditEventPage({
     }),
   ]);
 
-  if (!event) {
+  if (!event || event.userId !== session.user.id) {
     notFound();
   }
 

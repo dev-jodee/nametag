@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { env, getAppUrl } from '@/lib/env';
+import { env } from '@/lib/env';
 import { handleApiError, getClientIp, withLogging } from '@/lib/api-utils';
 import { securityLogger } from '@/lib/logger';
 
@@ -59,6 +59,7 @@ export const GET = withLogging(async function GET(request: Request) {
           prisma.person.updateMany({
             where: {
               id: person.id,
+              userId: event.userId,
               OR: [
                 { lastContact: null },
                 { lastContact: { lt: event.date } },
