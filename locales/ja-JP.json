@@ -1678,6 +1678,7 @@
       "customDate": "カスタム日付",
       "contactReminder": "連絡リマインダー",
       "lastContact": "最終連絡"
-    }
+    },
+    "loadError": "カレンダーイベントの読み込みに失敗しました"
   }
 }

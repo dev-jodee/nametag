@@ -1678,6 +1678,7 @@
       "customDate": "Egendefinert dato",
       "contactReminder": "Kontaktpåminnelse",
       "lastContact": "Siste kontakt"
-    }
+    },
+    "loadError": "Kunne ikke laste kalenderbegivenheter"
   }
 }

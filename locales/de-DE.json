@@ -1678,6 +1678,7 @@
       "customDate": "Benutzerdefiniertes Datum",
       "contactReminder": "Kontakterinnerung",
       "lastContact": "Letzter Kontakt"
-    }
+    },
+    "loadError": "Kalenderereignisse konnten nicht geladen werden"
   }
 }

@@ -1678,6 +1678,7 @@
       "customDate": "自定义日期",
       "contactReminder": "联系提醒",
       "lastContact": "最近联系"
-    }
+    },
+    "loadError": "无法加载日历事件"
   }
 }

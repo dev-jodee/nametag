@@ -1674,6 +1674,7 @@
       "customDate": "Custom date",
       "contactReminder": "Contact reminder",
       "lastContact": "Last contact"
-    }
+    },
+    "loadError": "Failed to load calendar events"
   }
 }

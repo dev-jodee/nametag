@@ -108,9 +108,19 @@ export const GET = withAuth(async (request, session) => {
 
       if (eventMonth !== month) continue;
 
+      const isYearUnknown = originalDate.getFullYear() <= 1604;
+
+      // ONCE reminders only appear in their original year (unless year is unknown)
+      if (
+        importantDate.reminderType === 'ONCE' &&
+        !isYearUnknown &&
+        originalDate.getFullYear() !== year
+      ) {
+        continue;
+      }
+
       // Project the date to the requested year
       const eventDay = originalDate.getDate();
-      const isYearUnknown = originalDate.getFullYear() <= 1604;
 
       const type = importantDate.type as CalendarEvent['type'] | null;
 

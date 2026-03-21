@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import type { CalendarEvent } from '@/app/api/calendar/route';
 
 const EVENT_COLORS: Record<CalendarEvent['type'], string> = {
@@ -47,11 +48,15 @@ export default function CalendarView({ initialYear, initialMonth }: CalendarView
       if (res.ok) {
         const data = await res.json();
         setEvents(data.events ?? []);
+      } else {
+        toast.error(t('loadError'));
       }
+    } catch {
+      toast.error(t('loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchEvents(year, month);

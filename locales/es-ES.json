@@ -1678,6 +1678,7 @@
       "customDate": "Fecha personalizada",
       "contactReminder": "Recordatorio de contacto",
       "lastContact": "Último contacto"
-    }
+    },
+    "loadError": "Error al cargar los eventos del calendario"
   }
 }
