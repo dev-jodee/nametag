@@ -57,7 +57,8 @@
     "userMenu": {
       "settings": "Settings",
       "signOut": "Sign out"
-    }
+    },
+    "calendar": "Calendar"
   },
   "settings": {
     "title": "Settings",
@@ -1632,5 +1633,48 @@
     "today": "Today",
     "yearUnknown": "Year unknown",
     "yearUnknownTooltip": "When checked, only the month and day will be saved. The year will be ignored."
+  },
+  "calendar": {
+    "title": "Calendar",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "loading": "Loading...",
+    "more": "more",
+    "viewFull": "View full calendar",
+    "openCalendar": "Open calendar",
+    "months": {
+      "january": "Jan",
+      "february": "Feb",
+      "march": "Mar",
+      "april": "Apr",
+      "may": "May",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Aug",
+      "september": "Sep",
+      "october": "Oct",
+      "november": "Nov",
+      "december": "Dec"
+    },
+    "days": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "legend": {
+      "birthday": "Birthday",
+      "anniversary": "Anniversary",
+      "nameday": "Name day",
+      "memorial": "Memorial",
+      "customDate": "Custom date",
+      "contactReminder": "Contact reminder",
+      "lastContact": "Last contact"
+    },
+    "loadError": "Failed to load calendar events"
   }
 }

@@ -57,7 +57,8 @@
     "userMenu": {
       "settings": "Einstellungen",
       "signOut": "Abmelden"
-    }
+    },
+    "calendar": "Kalender"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1636,5 +1637,48 @@
     "today": "Heute",
     "yearUnknown": "Jahr unbekannt",
     "yearUnknownTooltip": "Wenn aktiviert, werden nur der Monat und der Tag gespeichert. Das Jahr wird ignoriert."
+  },
+  "calendar": {
+    "title": "Kalender",
+    "prevMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "today": "Heute",
+    "loading": "Laden...",
+    "more": "weitere",
+    "viewFull": "Vollständigen Kalender anzeigen",
+    "openCalendar": "Kalender öffnen",
+    "months": {
+      "january": "Jan",
+      "february": "Feb",
+      "march": "Mär",
+      "april": "Apr",
+      "may": "Mai",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Aug",
+      "september": "Sep",
+      "october": "Okt",
+      "november": "Nov",
+      "december": "Dez"
+    },
+    "days": {
+      "sun": "So",
+      "mon": "Mo",
+      "tue": "Di",
+      "wed": "Mi",
+      "thu": "Do",
+      "fri": "Fr",
+      "sat": "Sa"
+    },
+    "legend": {
+      "birthday": "Geburtstag",
+      "anniversary": "Jahrestag",
+      "nameday": "Namenstag",
+      "memorial": "Gedenkfeier",
+      "customDate": "Benutzerdefiniertes Datum",
+      "contactReminder": "Kontakterinnerung",
+      "lastContact": "Letzter Kontakt"
+    },
+    "loadError": "Kalenderereignisse konnten nicht geladen werden"
   }
 }

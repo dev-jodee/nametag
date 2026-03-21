@@ -57,7 +57,8 @@
     "userMenu": {
       "settings": "設定",
       "signOut": "サインアウト"
-    }
+    },
+    "calendar": "カレンダー"
   },
   "settings": {
     "title": "設定",
@@ -1636,5 +1637,48 @@
     "today": "今日",
     "yearUnknown": "年不明",
     "yearUnknownTooltip": "チェックすると、月と日のみが保存されます。年は無視されます。"
+  },
+  "calendar": {
+    "title": "カレンダー",
+    "prevMonth": "前月",
+    "nextMonth": "翌月",
+    "today": "今日",
+    "loading": "読み込み中...",
+    "more": "件以上",
+    "viewFull": "カレンダー全体を表示",
+    "openCalendar": "カレンダーを開く",
+    "months": {
+      "january": "1月",
+      "february": "2月",
+      "march": "3月",
+      "april": "4月",
+      "may": "5月",
+      "june": "6月",
+      "july": "7月",
+      "august": "8月",
+      "september": "9月",
+      "october": "10月",
+      "november": "11月",
+      "december": "12月"
+    },
+    "days": {
+      "sun": "日",
+      "mon": "月",
+      "tue": "火",
+      "wed": "水",
+      "thu": "木",
+      "fri": "金",
+      "sat": "土"
+    },
+    "legend": {
+      "birthday": "誕生日",
+      "anniversary": "記念日",
+      "nameday": "名前の日",
+      "memorial": "追悼日",
+      "customDate": "カスタム日付",
+      "contactReminder": "連絡リマインダー",
+      "lastContact": "最終連絡"
+    },
+    "loadError": "カレンダーイベントの読み込みに失敗しました"
   }
 }
