@@ -59,7 +59,9 @@
       "signOut": "サインアウト"
     },
     "journal": "ジャーナル",
-    "createJournal": "新しいエントリー"
+    "createJournal": "新しいエントリー",
+    "events": "イベント",
+    "calendar": "カレンダー"
   },
   "settings": {
     "title": "設定",
@@ -1730,6 +1732,83 @@
       "writeOne": "書いてみる",
       "viewAll": "すべてのエントリーを見る",
       "newEntry": "新しいエントリー"
+    }
+  },
+  "calendar": {
+    "title": "カレンダー",
+    "prevMonth": "前月",
+    "nextMonth": "翌月",
+    "today": "今日",
+    "loading": "読み込み中...",
+    "more": "件以上",
+    "viewFull": "カレンダー全体を表示",
+    "openCalendar": "カレンダーを開く",
+    "months": {
+      "january": "1月",
+      "february": "2月",
+      "march": "3月",
+      "april": "4月",
+      "may": "5月",
+      "june": "6月",
+      "july": "7月",
+      "august": "8月",
+      "september": "9月",
+      "october": "10月",
+      "november": "11月",
+      "december": "12月"
+    },
+    "days": {
+      "sun": "日",
+      "mon": "月",
+      "tue": "火",
+      "wed": "水",
+      "thu": "木",
+      "fri": "金",
+      "sat": "土"
+    },
+    "legend": {
+      "birthday": "誕生日",
+      "anniversary": "記念日",
+      "nameday": "名前の日",
+      "memorial": "追悼日",
+      "customDate": "カスタム日付",
+      "contactReminder": "連絡リマインダー",
+      "lastContact": "最終連絡",
+      "plannedEvent": "予定イベント"
+    },
+    "loadError": "カレンダーイベントの読み込みに失敗しました"
+  },
+  "events": {
+    "title": "イベント",
+    "addEvent": "イベントを追加",
+    "newEvent": "新しいイベント",
+    "editEvent": "イベントを編集",
+    "backToEvents": "イベントに戻る",
+    "upcoming": "予定",
+    "past": "過去",
+    "noEvents": "まだイベントはありません。連絡先と何か計画しましょう！",
+    "noEventsForPerson": "この人との予定はまだありません。",
+    "edit": "編集",
+    "delete": "削除",
+    "confirmDelete": "このイベントを削除してもよろしいですか？",
+    "deleted": "イベントを削除しました",
+    "deleteFailed": "イベントの削除に失敗しました",
+    "form": {
+      "title": "タイトル",
+      "titlePlaceholder": "例：友達とコーヒー",
+      "dateTime": "日時",
+      "people": "人",
+      "peoplePlaceholder": "連絡先を検索...",
+      "titleRequired": "タイトルは必須です",
+      "dateRequired": "日時は必須です",
+      "peopleRequired": "少なくとも1人を選択してください",
+      "saveFailed": "イベントの保存に失敗しました",
+      "saving": "保存中...",
+      "create": "イベントを作成",
+      "update": "イベントを更新",
+      "created": "イベントを作成しました",
+      "updated": "イベントを更新しました",
+      "cancel": "キャンセル"
     }
   }
 }

@@ -36,6 +36,16 @@ const navIcons: Record<string, React.ReactNode> = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
     </svg>
   ),
+  events: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3.75 8.25h16.5M5.25 5.25h13.5c.828 0 1.5.672 1.5 1.5v12c0 .828-.672 1.5-1.5 1.5H5.25c-.828 0-1.5-.672-1.5-1.5v-12c0-.828.672-1.5 1.5-1.5z" />
+    </svg>
+  ),
+  calendar: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M5 11h14M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  ),
   relationshipTypes: (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
@@ -48,7 +58,9 @@ const navItems = [
   { href: '/people', labelKey: 'people', createHref: '/people/new', createLabelKey: 'people' },
   { href: '/groups', labelKey: 'groups', createHref: '/groups/new', createLabelKey: 'groups' },
   { href: '/journal', labelKey: 'journal', createHref: '/journal/new', createLabelKey: 'journal' },
+  { href: '/events', labelKey: 'events', createHref: '/events/new', createLabelKey: 'events' },
   { href: '/relationship-types', labelKey: 'relationshipTypes', createHref: '/relationship-types/new', createLabelKey: 'relationshipTypes' },
+  { href: '/calendar', labelKey: 'calendar' },
 ];
 
 export default function Navigation({ userEmail, userName, userNickname, userPhoto, currentPath }: NavigationProps) {

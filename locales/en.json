@@ -59,7 +59,9 @@
       "signOut": "Sign out"
     },
     "journal": "Journal",
-    "createJournal": "New entry"
+    "createJournal": "New entry",
+    "events": "Events",
+    "calendar": "Calendar"
   },
   "settings": {
     "title": "Settings",
@@ -1726,6 +1728,83 @@
       "writeOne": "Write one",
       "viewAll": "View all entries",
       "newEntry": "New entry"
+    }
+  },
+  "calendar": {
+    "title": "Calendar",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "loading": "Loading...",
+    "more": "more",
+    "viewFull": "View full calendar",
+    "openCalendar": "Open calendar",
+    "months": {
+      "january": "Jan",
+      "february": "Feb",
+      "march": "Mar",
+      "april": "Apr",
+      "may": "May",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Aug",
+      "september": "Sep",
+      "october": "Oct",
+      "november": "Nov",
+      "december": "Dec"
+    },
+    "days": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "legend": {
+      "birthday": "Birthday",
+      "anniversary": "Anniversary",
+      "nameday": "Name day",
+      "memorial": "Memorial",
+      "customDate": "Custom date",
+      "contactReminder": "Contact reminder",
+      "lastContact": "Last contact",
+      "plannedEvent": "Planned event"
+    },
+    "loadError": "Failed to load calendar events"
+  },
+  "events": {
+    "title": "Events",
+    "addEvent": "Add Event",
+    "newEvent": "New Event",
+    "editEvent": "Edit Event",
+    "backToEvents": "Back to Events",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "noEvents": "No events yet. Plan something with your contacts!",
+    "noEventsForPerson": "No events planned with this person yet.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this event?",
+    "deleted": "Event deleted",
+    "deleteFailed": "Failed to delete event",
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "e.g. Coffee with friends",
+      "dateTime": "Date & Time",
+      "people": "People",
+      "peoplePlaceholder": "Search contacts...",
+      "titleRequired": "Title is required",
+      "dateRequired": "Date and time are required",
+      "peopleRequired": "Please select at least one person",
+      "saveFailed": "Failed to save event",
+      "saving": "Saving...",
+      "create": "Create Event",
+      "update": "Update Event",
+      "created": "Event created",
+      "updated": "Event updated",
+      "cancel": "Cancel"
     }
   }
 }

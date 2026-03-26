@@ -59,7 +59,9 @@
       "signOut": "Abmelden"
     },
     "journal": "Tagebuch",
-    "createJournal": "Neuer Eintrag"
+    "createJournal": "Neuer Eintrag",
+    "events": "Ereignisse",
+    "calendar": "Kalender"
   },
   "settings": {
     "title": "Einstellungen",
@@ -1728,6 +1730,83 @@
       "writeOne": "Einen schreiben",
       "viewAll": "Alle Einträge anzeigen",
       "newEntry": "Neuer Eintrag"
+    }
+  },
+  "calendar": {
+    "title": "Kalender",
+    "prevMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "today": "Heute",
+    "loading": "Laden...",
+    "more": "weitere",
+    "viewFull": "Vollständigen Kalender anzeigen",
+    "openCalendar": "Kalender öffnen",
+    "months": {
+      "january": "Jan",
+      "february": "Feb",
+      "march": "Mär",
+      "april": "Apr",
+      "may": "Mai",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Aug",
+      "september": "Sep",
+      "october": "Okt",
+      "november": "Nov",
+      "december": "Dez"
+    },
+    "days": {
+      "sun": "So",
+      "mon": "Mo",
+      "tue": "Di",
+      "wed": "Mi",
+      "thu": "Do",
+      "fri": "Fr",
+      "sat": "Sa"
+    },
+    "legend": {
+      "birthday": "Geburtstag",
+      "anniversary": "Jahrestag",
+      "nameday": "Namenstag",
+      "memorial": "Gedenkfeier",
+      "customDate": "Benutzerdefiniertes Datum",
+      "contactReminder": "Kontakterinnerung",
+      "lastContact": "Letzter Kontakt",
+      "plannedEvent": "Geplantes Ereignis"
+    },
+    "loadError": "Kalenderereignisse konnten nicht geladen werden"
+  },
+  "events": {
+    "title": "Ereignisse",
+    "addEvent": "Ereignis hinzufügen",
+    "newEvent": "Neues Ereignis",
+    "editEvent": "Ereignis bearbeiten",
+    "backToEvents": "Zurück zu Ereignissen",
+    "upcoming": "Bevorstehend",
+    "past": "Vergangen",
+    "noEvents": "Noch keine Ereignisse. Plane etwas mit deinen Kontakten!",
+    "noEventsForPerson": "Noch keine Ereignisse mit dieser Person geplant.",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "confirmDelete": "Möchtest du dieses Ereignis wirklich löschen?",
+    "deleted": "Ereignis gelöscht",
+    "deleteFailed": "Fehler beim Löschen des Ereignisses",
+    "form": {
+      "title": "Titel",
+      "titlePlaceholder": "z.B. Kaffee mit Freunden",
+      "dateTime": "Datum & Uhrzeit",
+      "people": "Personen",
+      "peoplePlaceholder": "Kontakte suchen...",
+      "titleRequired": "Titel ist erforderlich",
+      "dateRequired": "Datum und Uhrzeit sind erforderlich",
+      "peopleRequired": "Bitte wähle mindestens eine Person aus",
+      "saveFailed": "Fehler beim Speichern des Ereignisses",
+      "saving": "Speichern...",
+      "create": "Ereignis erstellen",
+      "update": "Ereignis aktualisieren",
+      "created": "Ereignis erstellt",
+      "updated": "Ereignis aktualisiert",
+      "cancel": "Abbrechen"
     }
   }
 }

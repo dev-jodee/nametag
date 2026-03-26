@@ -59,7 +59,9 @@
       "signOut": "退出登录"
     },
     "journal": "日记",
-    "createJournal": "新条目"
+    "createJournal": "新条目",
+    "events": "活动",
+    "calendar": "日历"
   },
   "settings": {
     "title": "设置",
@@ -1730,6 +1732,83 @@
       "writeOne": "写一条",
       "viewAll": "查看所有条目",
       "newEntry": "新条目"
+    }
+  },
+  "calendar": {
+    "title": "日历",
+    "prevMonth": "上个月",
+    "nextMonth": "下个月",
+    "today": "今天",
+    "loading": "加载中...",
+    "more": "更多",
+    "viewFull": "查看完整日历",
+    "openCalendar": "打开日历",
+    "months": {
+      "january": "1月",
+      "february": "2月",
+      "march": "3月",
+      "april": "4月",
+      "may": "5月",
+      "june": "6月",
+      "july": "7月",
+      "august": "8月",
+      "september": "9月",
+      "october": "10月",
+      "november": "11月",
+      "december": "12月"
+    },
+    "days": {
+      "sun": "日",
+      "mon": "一",
+      "tue": "二",
+      "wed": "三",
+      "thu": "四",
+      "fri": "五",
+      "sat": "六"
+    },
+    "legend": {
+      "birthday": "生日",
+      "anniversary": "周年纪念",
+      "nameday": "命名日",
+      "memorial": "纪念日",
+      "customDate": "自定义日期",
+      "contactReminder": "联系提醒",
+      "lastContact": "最近联系",
+      "plannedEvent": "计划事件"
+    },
+    "loadError": "无法加载日历事件"
+  },
+  "events": {
+    "title": "活动",
+    "addEvent": "添加活动",
+    "newEvent": "新建活动",
+    "editEvent": "编辑活动",
+    "backToEvents": "返回活动",
+    "upcoming": "即将到来",
+    "past": "过去",
+    "noEvents": "还没有活动。和您的联系人计划一些事情吧！",
+    "noEventsForPerson": "还没有与此人计划的活动。",
+    "edit": "编辑",
+    "delete": "删除",
+    "confirmDelete": "确定要删除此活动吗？",
+    "deleted": "活动已删除",
+    "deleteFailed": "删除活动失败",
+    "form": {
+      "title": "标题",
+      "titlePlaceholder": "例：和朋友喝咖啡",
+      "dateTime": "日期和时间",
+      "people": "人员",
+      "peoplePlaceholder": "搜索联系人...",
+      "titleRequired": "标题为必填项",
+      "dateRequired": "日期和时间为必填项",
+      "peopleRequired": "请至少选择一个人",
+      "saveFailed": "保存活动失败",
+      "saving": "保存中...",
+      "create": "创建活动",
+      "update": "更新活动",
+      "created": "活动已创建",
+      "updated": "活动已更新",
+      "cancel": "取消"
     }
   }
 }
