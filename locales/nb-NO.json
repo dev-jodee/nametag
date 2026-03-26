@@ -47,6 +47,7 @@
     "dashboard": "Dashbord",
     "people": "Personer",
     "groups": "Grupper",
+    "events": "Hendelser",
     "relationshipTypes": "Relasjonstyper",
     "settings": "Innstillinger",
     "search": {
@@ -57,7 +58,8 @@
     "userMenu": {
       "settings": "Innstillinger",
       "signOut": "Logg ut"
-    }
+    },
+    "calendar": "Kalender"
   },
   "settings": {
     "title": "Innstillinger",
@@ -1639,5 +1641,82 @@
     "today": "I dag",
     "yearUnknown": "År ukjent",
     "yearUnknownTooltip": "Når dette er avkrysset, lagres kun måneden og dagen. Året ignoreres."
+  },
+  "calendar": {
+    "title": "Kalender",
+    "prevMonth": "Forrige måned",
+    "nextMonth": "Neste måned",
+    "today": "I dag",
+    "loading": "Laster...",
+    "more": "til",
+    "viewFull": "Vis full kalender",
+    "openCalendar": "Åpne kalender",
+    "months": {
+      "january": "Jan",
+      "february": "Feb",
+      "march": "Mar",
+      "april": "Apr",
+      "may": "Mai",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Aug",
+      "september": "Sep",
+      "october": "Okt",
+      "november": "Nov",
+      "december": "Des"
+    },
+    "days": {
+      "sun": "Søn",
+      "mon": "Man",
+      "tue": "Tir",
+      "wed": "Ons",
+      "thu": "Tor",
+      "fri": "Fre",
+      "sat": "Lør"
+    },
+    "legend": {
+      "birthday": "Bursdag",
+      "anniversary": "Jubileum",
+      "nameday": "Navnedag",
+      "memorial": "Minnedag",
+      "customDate": "Egendefinert dato",
+      "contactReminder": "Kontaktpåminnelse",
+      "lastContact": "Siste kontakt",
+      "plannedEvent": "Planlagt hendelse"
+    },
+    "loadError": "Kunne ikke laste kalenderbegivenheter"
+  },
+  "events": {
+    "title": "Hendelser",
+    "addEvent": "Legg til hendelse",
+    "newEvent": "Ny hendelse",
+    "editEvent": "Rediger hendelse",
+    "backToEvents": "Tilbake til hendelser",
+    "upcoming": "Kommende",
+    "past": "Tidligere",
+    "noEvents": "Ingen hendelser ennå. Planlegg noe med kontaktene dine!",
+    "noEventsForPerson": "Ingen planlagte hendelser med denne personen ennå.",
+    "edit": "Rediger",
+    "delete": "Slett",
+    "confirmDelete": "Er du sikker på at du vil slette denne hendelsen?",
+    "deleted": "Hendelse slettet",
+    "deleteFailed": "Kunne ikke slette hendelsen",
+    "form": {
+      "title": "Tittel",
+      "titlePlaceholder": "f.eks. Kaffe med venner",
+      "dateTime": "Dato og tid",
+      "people": "Personer",
+      "peoplePlaceholder": "Søk etter kontakter...",
+      "titleRequired": "Tittel er påkrevd",
+      "dateRequired": "Dato og tid er påkrevd",
+      "peopleRequired": "Velg minst én person",
+      "saveFailed": "Kunne ikke lagre hendelsen",
+      "saving": "Lagrer...",
+      "create": "Opprett hendelse",
+      "update": "Oppdater hendelse",
+      "created": "Hendelse opprettet",
+      "updated": "Hendelse oppdatert",
+      "cancel": "Avbryt"
+    }
   }
 }

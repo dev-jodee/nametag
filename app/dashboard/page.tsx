@@ -8,6 +8,7 @@ import { formatDate, formatDateWithoutYear } from '@/lib/date-format';
 import { getUpcomingEvents } from '@/lib/upcoming-events';
 import { getTranslations } from 'next-intl/server';
 import PersonAvatar from '@/components/PersonPhoto';
+import MiniCalendar from '@/components/MiniCalendar';
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -113,6 +114,9 @@ export default async function DashboardPage() {
               </div>
             </div>
           )}
+
+          {/* Mini Calendar */}
+          <MiniCalendar />
 
           {/* Network Graph */}
           {peopleCount > 0 ? (

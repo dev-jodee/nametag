@@ -61,7 +61,9 @@ export default function Navigation({ userEmail, userName, userNickname, userPhot
     { href: '/dashboard', labelKey: 'dashboard' },
     { href: '/people', labelKey: 'people', createHref: '/people/new', createLabelKey: 'people' },
     { href: '/groups', labelKey: 'groups', createHref: '/groups/new', createLabelKey: 'groups' },
+    { href: '/events', labelKey: 'events', createHref: '/events/new', createLabelKey: 'events' },
     { href: '/relationship-types', labelKey: 'relationshipTypes', createHref: '/relationship-types/new', createLabelKey: 'relationshipTypes' },
+    { href: '/calendar', labelKey: 'calendar' },
   ];
 
   const isActive = (href: string) => {
@@ -74,7 +76,7 @@ export default function Navigation({ userEmail, userName, userNickname, userPhot
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left section: Logo, Search (desktop), Nav items (desktop) */}
-          <div className="flex items-center space-x-4 md:space-x-8">
+          <div className="flex min-w-0 items-center gap-3 md:gap-5">
             <Link href="/dashboard" className="flex items-center flex-shrink-0">
               <Image
                 src="/logo.svg"
@@ -91,7 +93,7 @@ export default function Navigation({ userEmail, userName, userNickname, userPhot
             </div>
 
             {/* Desktop nav items */}
-            <div className="hidden lg:flex space-x-4">
+            <div className="hidden min-w-0 lg:flex items-center gap-2 xl:gap-3">
               {navItems.map((item) => (
                 <div key={item.href}>
                   {item.createHref ? (
@@ -102,7 +104,7 @@ export default function Navigation({ userEmail, userName, userNickname, userPhot
                     }`}>
                       <Link
                         href={item.href}
-                        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium ${
+                        className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs xl:text-sm font-medium whitespace-nowrap ${
                           isActive(item.href)
                             ? 'text-primary'
                             : 'text-foreground'
@@ -118,7 +120,7 @@ export default function Navigation({ userEmail, userName, userNickname, userPhot
                       }`} />
                       <Link
                         href={item.createHref}
-                        className={`px-2 py-2 transition-colors ${
+                        className={`px-1.5 py-1.5 transition-colors ${
                           isActive(item.href)
                             ? 'text-primary hover:text-primary-dark'
                             : 'text-muted hover:text-primary'
@@ -126,7 +128,7 @@ export default function Navigation({ userEmail, userName, userNickname, userPhot
                         title={`${tCommon('create')} ${tNav(item.createLabelKey || item.labelKey)}`}
                         aria-label={`${tCommon('create')} ${tNav(item.createLabelKey || item.labelKey)}`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg className="w-3.5 h-3.5 xl:w-4 xl:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
                       </Link>
@@ -135,7 +137,7 @@ export default function Navigation({ userEmail, userName, userNickname, userPhot
                     <div className="flex items-center">
                       <Link
                         href={item.href}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium border ${
+                        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs xl:text-sm font-medium border whitespace-nowrap ${
                           isActive(item.href)
                             ? 'text-primary bg-primary/10 border-primary'
                             : 'text-foreground bg-surface-elevated border-border hover:bg-surface-elevated hover:border-primary/50'
@@ -152,7 +154,7 @@ export default function Navigation({ userEmail, userName, userNickname, userPhot
           </div>
 
           {/* Right section: User menu (all screens), Hamburger (mobile) */}
-          <div className="flex items-center space-x-2">
+          <div className="flex shrink-0 items-center space-x-2">
             {userEmail && (
               <UserMenu userEmail={userEmail} userName={userName} userNickname={userNickname} userPhoto={userPhoto} />
             )}

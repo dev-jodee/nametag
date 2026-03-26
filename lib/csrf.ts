@@ -2,6 +2,11 @@ import { getAppUrl } from '@/lib/env';
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
+function getFirstForwardedValue(value: string | null): string | null {
+  if (!value) return null;
+  return value.split(',')[0]?.trim() || null;
+}
+
 /**
  * Builds the set of origins that are considered valid for CSRF checks.
  * Includes the configured app URL and the request's own Host header,
@@ -15,18 +20,19 @@ function getAllowedOrigins(request: Request): Set<string> {
   const appUrl = getAppUrl();
   allowed.add(new URL(appUrl).origin);
 
-  // Also trust the Host header the request was sent to.
+  const proto =
+    getFirstForwardedValue(request.headers.get('x-forwarded-proto')) ||
+    (new URL(request.url).protocol === 'https:' ? 'https' : 'http');
+
+  // Also trust the externally forwarded host (preferred) or the Host header
+  // the request was sent to.
   // Browsers enforce that Origin and Host match for same-origin requests,
-  // so accepting Host covers cases where the user accesses the app via a
-  // different hostname/port than what NEXTAUTH_URL is set to (common in
-  // Docker and LAN setups).
-  const host = request.headers.get('host');
+  // so accepting the forwarded/host value covers cases where the user
+  // accesses the app via a different hostname/port than what NEXTAUTH_URL
+  // is set to (common in Docker, LAN, and reverse-proxy setups).
+  const forwardedHost = getFirstForwardedValue(request.headers.get('x-forwarded-host'));
+  const host = forwardedHost || request.headers.get('host');
   if (host) {
-    // Host header doesn't include a scheme; infer from the request URL
-    // or from the X-Forwarded-Proto header (set by reverse proxies).
-    const proto =
-      request.headers.get('x-forwarded-proto') ||
-      (new URL(request.url).protocol === 'https:' ? 'https' : 'http');
     allowed.add(`${proto}://${host}`);
   }
 
