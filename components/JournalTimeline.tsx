@@ -102,10 +102,9 @@ function groupByMonth(entries: TimelineEntry[], locale: string): MonthGroup[] {
       month: 'long',
     });
 
-    // Sort entries within the month descending by date
-    const monthEntries = (map.get(monthKey) ?? []).sort(
-      (a, b) => b.date.localeCompare(a.date)
-    );
+    // Entries are already sorted by the server (date desc, createdAt desc)
+    // so we preserve insertion order
+    const monthEntries = map.get(monthKey) ?? [];
 
     return { monthKey, label, entries: monthEntries };
   });

@@ -76,7 +76,7 @@ export default async function JournalPage({
           },
         },
       },
-      orderBy: { date: 'desc' },
+      orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
     }),
   ]);
 
