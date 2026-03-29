@@ -235,7 +235,7 @@ export default async function PersonDetailsPage({
           },
         },
       },
-      orderBy: { date: 'desc' },
+      orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
     }),
   ]);
 
