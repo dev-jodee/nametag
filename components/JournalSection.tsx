@@ -52,6 +52,7 @@ export default function JournalSection({
   personId,
   latestEntry,
   nameOrder,
+  locale,
 }: JournalSectionProps) {
   const t = useTranslations('journal.personSection');
 
