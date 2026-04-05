@@ -170,7 +170,7 @@ describe('GroupForm', () => {
         </Wrapper>
       );
 
-      const redColorButton = screen.getByTitle('#EF4444');
+      const redColorButton = screen.getByTitle(PRESET_COLORS[0]);
       await user.click(redColorButton);
 
       const colorInput = screen.getByLabelText(/or choose a custom color/i) as HTMLInputElement;
