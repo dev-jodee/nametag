@@ -198,7 +198,7 @@ describe('GroupForm', () => {
 
       const colorInput = screen.getByLabelText(/or choose a custom color/i) as HTMLInputElement;
 
-      await user.click(screen.getByRole('button', { name: /reroll color/i }));
+      await user.click(screen.getByRole('button', { name: /Generate a random color/i }));
 
       expect(colorInput.value).toMatch(/^#[0-9a-f]{6}$/i);
     });
