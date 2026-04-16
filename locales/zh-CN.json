@@ -1211,6 +1211,7 @@
       "descriptionPlaceholder": "此分组的可选描述",
       "color": "颜色",
       "customColor": "或选择自定义颜色：",
+      "generateRandomColor": "生成随机颜色",
       "addPeople": "添加联系人(可选)",
       "addPeoplePlaceholder": "输入名称以添加联系人...",
       "addPeopleHelp": "您可以立即将联系人添加到此分组，或稍后从分组详情页添加。",

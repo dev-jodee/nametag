@@ -1207,6 +1207,7 @@
       "descriptionPlaceholder": "Optional description for this group",
       "color": "Color",
       "customColor": "Or choose a custom color:",
+      "generateRandomColor": "Generate a random color",
       "addPeople": "Add People (Optional)",
       "addPeoplePlaceholder": "Type a name to add people...",
       "addPeopleHelp": "You can add people to this group now, or do it later from the group details page.",

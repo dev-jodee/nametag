@@ -1211,6 +1211,7 @@
       "descriptionPlaceholder": "Valgfri beskrivelse for denne gruppen",
       "color": "Farge",
       "customColor": "Eller velg en egendefinert farge:",
+      "generateRandomColor": "Generer en tilfeldig farge",
       "addPeople": "Legg til personer (valgfritt)",
       "addPeoplePlaceholder": "Skriv et navn for å legge til personer...",
       "addPeopleHelp": "Du kan legge til personer i denne gruppen nå, eller gjøre det senere fra gruppedetaljsiden.",

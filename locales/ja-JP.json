@@ -1211,6 +1211,7 @@
       "descriptionPlaceholder": "このグループのオプションの説明",
       "color": "色",
       "customColor": "またはカスタムカラーを選択：",
+      "generateRandomColor": "ランダムな色を生成",
       "addPeople": "人を追加（オプション）",
       "addPeoplePlaceholder": "名前を入力して人を追加...",
       "addPeopleHelp": "このグループに今すぐ人を追加することも、後でグループの詳細ページから追加することもできます。",

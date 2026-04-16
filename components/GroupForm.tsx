@@ -189,8 +189,8 @@ export default function GroupForm({
               type="button"
               onClick={handleRerollColor}
               className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted hover:bg-surface-elevated hover:text-foreground"
-              aria-label="Reroll color"
-              title="Reroll color"
+              aria-label={t('generateRandomColor')}
+              title={t('generateRandomColor')}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
                 <rect width="12" height="12" x="2" y="10" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round" />

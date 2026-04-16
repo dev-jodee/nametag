@@ -1209,6 +1209,7 @@
       "descriptionPlaceholder": "Optionale Beschreibung für diese Gruppe",
       "color": "Farbe",
       "customColor": "Oder wähle eine benutzerdefinierte Farbe:",
+      "generateRandomColor": "Eine zufällige Farbe generieren",
       "addPeople": "Personen hinzufügen (optional)",
       "addPeoplePlaceholder": "Tippe einen Namen, um Personen hinzuzufügen...",
       "addPeopleHelp": "Du kannst Personen jetzt hinzufügen oder später auf der Gruppendetailseite.",
