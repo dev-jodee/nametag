@@ -4,10 +4,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const capturedLines = vi.hoisted<Record<string, unknown>[]>(() => []);
 
 vi.mock('@/lib/logger', async () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { Writable } = require('node:stream') as typeof import('node:stream');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pino = require('pino') as typeof import('pino');
+  const { Writable } = await import('node:stream');
+  const { default: pino } = await import('pino');
 
   const actual = await vi.importActual<typeof import('@/lib/logger')>('@/lib/logger');
 
@@ -18,7 +16,7 @@ vi.mock('@/lib/logger', async () => {
     },
   });
 
-  const log = pino.default({ ...actual.pinoOptions, transport: undefined }, stream);
+  const log = pino({ ...actual.pinoOptions, transport: undefined }, stream);
 
   return {
     ...actual,

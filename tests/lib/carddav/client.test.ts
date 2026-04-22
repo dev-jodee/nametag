@@ -14,7 +14,7 @@ const createDAVClientMock = vi.fn(async () => ({
 }));
 
 vi.mock('tsdav', () => ({
-  createDAVClient: (...args: unknown[]) => createDAVClientMock(...args),
+  createDAVClient: () => createDAVClientMock(),
 }));
 
 vi.mock('@/lib/carddav/encryption', () => ({

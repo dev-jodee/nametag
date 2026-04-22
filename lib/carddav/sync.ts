@@ -515,6 +515,8 @@ export async function syncToServer(
             : mapping.person.surname || 'Unknown',
         });
 
+        updateContext({ personId: mapping.personId });
+
         // Clean up legacy "Unknown vCard Properties" from notes (issue #130)
         if (mapping.person.notes?.includes('--- Unknown vCard Properties ---')) {
           const cleanedNotes = mapping.person.notes
@@ -560,7 +562,6 @@ export async function syncToServer(
 
           let updated: VCard;
           try {
-            updateContext({ personId: mapping.personId });
             updated = await withRetry(
               () => client.updateVCard(vCard, vCardData),
               { maxAttempts: 3 }
