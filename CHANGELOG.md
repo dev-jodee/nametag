@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.43.2](https://github.com/mattogodoy/nametag/compare/v0.43.1...v0.43.2) (2026-04-22)
+
+
+### Bug Fixes
+
+* **carddav:** drop REV/PRODID round-trip and fix backslash unescape ([af1b922](https://github.com/mattogodoy/nametag/commit/af1b922e00589c3a77ded206cb223138766bf636))
+* **carddav:** drop REV/PRODID round-trip and fix backslash unescape ([8b01d79](https://github.com/mattogodoy/nametag/commit/8b01d7972e5cfbe66656454d9e7a4dc18367ab6c))
+
 ## [0.43.1](https://github.com/mattogodoy/nametag/compare/v0.43.0...v0.43.1) (2026-04-22)
 
 
