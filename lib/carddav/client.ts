@@ -7,6 +7,42 @@ import { readBodySafely } from '@/lib/logging/http-body';
 
 const log = createModuleLogger('carddav');
 
+/**
+ * Truncate embedded PHOTO base64 in a vCard so it can be safely logged.
+ * Preserves structure (headers, params, line folding) of everything else.
+ */
+function truncateVCardForLog(vcard: string, maxPhotoValueChars = 40): string {
+  const lines = vcard.split(/\r?\n/);
+  const out: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!/^PHOTO[;:]/i.test(line)) {
+      out.push(line);
+      continue;
+    }
+    let full = line;
+    let j = i + 1;
+    while (j < lines.length && /^[ \t]/.test(lines[j])) {
+      full += lines[j].substring(1);
+      j++;
+    }
+    i = j - 1;
+    const colonIdx = full.indexOf(':');
+    if (colonIdx < 0) {
+      out.push(full.slice(0, 80) + '…[truncated]');
+      continue;
+    }
+    const header = full.slice(0, colonIdx);
+    const value = full.slice(colonIdx + 1);
+    out.push(
+      value.length > maxPhotoValueChars
+        ? `${header}:${value.slice(0, maxPhotoValueChars)}…[+${value.length - maxPhotoValueChars} chars]`
+        : `${header}:${value}`,
+    );
+  }
+  return out.join('\r\n');
+}
+
 export interface AddressBook {
   url: string;
   displayName?: string;
@@ -136,6 +172,7 @@ export async function createCardDavClient(
           context: {
             serverHost: new URL(serverUrl).host,
             filename,
+            outgoingVCard: truncateVCardForLog(vCardData),
           },
         });
       }
@@ -190,6 +227,7 @@ export async function createCardDavClient(
           context: {
             serverHost: new URL(serverUrl).host,
             etag: vCard.etag,
+            outgoingVCard: truncateVCardForLog(newData),
           },
         });
       }
