@@ -83,4 +83,32 @@ describe('logger integration', () => {
     expect(lines[0].err).toMatchObject({ message: 'oops' });
     expect(lines[0].err).toHaveProperty('stack');
   });
+
+  it('child logger bindings win over mixin on colliding keys', () => {
+    const { logger, lines } = captureLogger();
+    runWithContext({ requestId: 'req-1', module: 'from-context' }, () => {
+      const child = logger.child({ module: 'carddav' });
+      child.info('x');
+    });
+    expect(lines[0].module).toBe('carddav');
+    expect(lines[0].requestId).toBe('req-1');
+  });
+
+  it('explicit record fields win over mixin on colliding keys', () => {
+    const { logger, lines } = captureLogger();
+    runWithContext({ requestId: 'req-1' }, () => {
+      logger.info({ requestId: 'override' }, 'y');
+    });
+    expect(lines[0].requestId).toBe('override');
+  });
+
+  it('err.context keys do not overwrite core err fields like code or stack', () => {
+    const { logger, lines } = captureLogger();
+    const err = new AppError('boom', { code: 'real_code', context: { code: 'fake', stack: 'fake' } });
+    logger.error({ err }, 'test');
+    const errRecord = lines[0].err as Record<string, unknown>;
+    expect(errRecord.code).toBe('real_code');
+    expect(typeof errRecord.stack).toBe('string');
+    expect(errRecord.stack).not.toBe('fake');
+  });
 });
