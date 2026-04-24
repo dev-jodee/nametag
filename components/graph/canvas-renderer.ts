@@ -146,6 +146,54 @@ function drawLabel(rc: RenderContext, node: SimulationNode, color: string): void
   rc.ctx.fillText(node.label, node.x, (node.y ?? 0) + r + dy - r);
 }
 
+function drawBubble(rc: RenderContext, node: SimulationNode): void {
+  if (node.kind !== 'bubble') return;
+  if (node.x === undefined || node.y === undefined) return;
+  const r = nodeRadius(node, rc.isMobile);
+
+  if (node.isExpanded) {
+    // Ghost collapse target: faint halo + label. Clickable to re-collapse the group.
+    rc.ctx.beginPath();
+    rc.ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+    rc.ctx.fillStyle = getNodeFill(node, rc.isDark);
+    rc.ctx.globalAlpha = 0.25;
+    rc.ctx.fill();
+    rc.ctx.globalAlpha = 1;
+
+    if (rc.lod !== 'dots') {
+      const fontSize = nodeFontSize(node, rc.isMobile);
+      rc.ctx.font = `600 ${fontSize}px system-ui, -apple-system, sans-serif`;
+      rc.ctx.fillStyle = rc.isDark ? '#f3f4f6' : '#111827';
+      rc.ctx.textAlign = 'center';
+      rc.ctx.textBaseline = 'top';
+      rc.ctx.fillText(node.label, node.x, node.y + r + 4);
+    }
+    return;
+  }
+
+  rc.ctx.beginPath();
+  rc.ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+  rc.ctx.fillStyle = getNodeFill(node, rc.isDark);
+  rc.ctx.globalAlpha = 0.75;
+  rc.ctx.fill();
+  rc.ctx.globalAlpha = 1;
+
+  if (rc.lod !== 'dots') {
+    rc.ctx.lineWidth = 2;
+    rc.ctx.strokeStyle = getNodeStroke(node, rc.isDark);
+    rc.ctx.stroke();
+  }
+
+  if (rc.lod !== 'dots') {
+    const fontSize = nodeFontSize(node, rc.isMobile);
+    rc.ctx.font = `600 ${fontSize}px system-ui, -apple-system, sans-serif`;
+    rc.ctx.fillStyle = rc.isDark ? '#ffffff' : '#111827';
+    rc.ctx.textAlign = 'center';
+    rc.ctx.textBaseline = 'middle';
+    rc.ctx.fillText(node.label, node.x, node.y);
+  }
+}
+
 export function paintFrame(
   rc: RenderContext,
   nodes: SimulationNode[],
@@ -178,11 +226,16 @@ export function paintFrame(
   }
 
   // Nodes above edges
-  for (const node of nodes) drawNode(rc, node);
+  for (const node of nodes) {
+    if (node.kind === 'bubble') drawBubble(rc, node);
+    else drawNode(rc, node);
+  }
 
   if (rc.lod !== 'dots') {
     const labelColor = rc.isDark ? '#f3f4f6' : '#111827';
-    for (const node of nodes) drawLabel(rc, node, labelColor);
+    for (const node of nodes) {
+      if (node.kind === 'person') drawLabel(rc, node, labelColor);
+    }
   }
 
   rc.ctx.restore();
