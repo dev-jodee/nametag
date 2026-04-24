@@ -109,6 +109,10 @@ export default function UnifiedNetworkGraph({
     );
   };
 
+  const requestPaint = useCallback(() => {
+    dirtyRef.current = true;
+  }, []);
+
   // Step 1: Paint loop
   const runPaint = useCallback(() => {
     const canvas = canvasRef.current;
@@ -131,6 +135,26 @@ export default function UnifiedNetworkGraph({
     const lod = getLODTier(transform.k);
     const isDark = document.documentElement.classList.contains('dark');
 
+    // Request photos for nodes that will render at full LOD and are in viewport.
+    if (lod === 'full') {
+      const padPx = 64;
+      for (const node of nodesRef.current) {
+        if (node.kind !== 'person') continue;
+        if (!node.photo) continue;
+        if (node.x === undefined || node.y === undefined) continue;
+        const screenX = node.x * transform.k + transform.x;
+        const screenY = node.y * transform.k + transform.y;
+        if (
+          screenX < -padPx || screenX > rect.width + padPx ||
+          screenY < -padPx || screenY > rect.height + padPx
+        ) continue;
+        const src = node.id.startsWith('user-')
+          ? '/api/photos/user'
+          : `/api/photos/${node.id}`;
+        loadPhoto(node.id, src, requestPaint);
+      }
+    }
+
     paintFrame(
       {
         ctx,
@@ -146,7 +170,7 @@ export default function UnifiedNetworkGraph({
       nodesRef.current,
       edgesRef.current,
     );
-  }, [isMobile]);
+  }, [isMobile, requestPaint]);
 
   useEffect(() => {
     const tick = () => {
@@ -161,10 +185,6 @@ export default function UnifiedNetworkGraph({
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   }, [runPaint]);
-
-  const requestPaint = useCallback(() => {
-    dirtyRef.current = true;
-  }, []);
 
   // Step 2: Simulation builder
   const buildSimulation = useCallback((nodes: SimulationNode[], edges: SimulationEdge[]) => {
@@ -348,9 +368,6 @@ export default function UnifiedNetworkGraph({
     };
   }, [centerNodeNonClickable, isMobile, requestPaint, router]);
 
-  // loadPhoto is used indirectly via getCachedPhoto callbacks in paintFrame;
-  // reference it here to keep the import from being flagged by linters.
-  void loadPhoto;
   // capitalizeType is reserved for future label rendering use.
   void capitalizeType;
 
