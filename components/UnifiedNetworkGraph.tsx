@@ -109,32 +109,250 @@ export default function UnifiedNetworkGraph({
     );
   };
 
-  // --- rendering stubs; Tasks 8–10 fill these in ---
+  // Step 1: Paint loop
+  const runPaint = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Keep backing store in sync with CSS size and DPR.
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    const wantW = Math.floor(rect.width * dpr);
+    const wantH = Math.floor(rect.height * dpr);
+    if (canvas.width !== wantW || canvas.height !== wantH) {
+      canvas.width = wantW;
+      canvas.height = wantH;
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const transform = transformRef.current;
+    const lod = getLODTier(transform.k);
+    const isDark = document.documentElement.classList.contains('dark');
+
+    paintFrame(
+      {
+        ctx,
+        transform,
+        width: rect.width,
+        height: rect.height,
+        lod,
+        isDark,
+        isMobile,
+        hoveredNodeId: hoveredNodeIdRef.current,
+        getPhoto: getCachedPhoto,
+      },
+      nodesRef.current,
+      edgesRef.current,
+    );
+  }, [isMobile]);
+
+  useEffect(() => {
+    const tick = () => {
+      if (dirtyRef.current) {
+        dirtyRef.current = false;
+        runPaint();
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [runPaint]);
+
   const requestPaint = useCallback(() => {
     dirtyRef.current = true;
   }, []);
 
-  // The following are referenced here so TypeScript/ESLint does not flag them
-  // as unused while Task 8 wires them up. Do not remove.
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  const _unusedRefs = {
-    simRef, nodesRef, edgesRef, quadtreeRef, hoveredNodeIdRef, rafRef,
-    zoomBehaviorRef, transformRef,
-  };
-  const _unusedProps = {
-    apiEndpoint, centerNodeNonClickable, linkDistance, chargeStrength, refreshKey,
-    clusterStrength, capitalizeType, router, isMobile, clusteringEnabled,
-    includeGroupIds, excludeGroupIds, includeMode, requestPaint,
-  };
-  const _unusedImports = {
-    paintFrame, getLODTier, getCachedPhoto, loadPhoto, buildQuadtree,
-    findNodeAtPoint, diffSimulationData,
-    forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide,
-    forceX, forceY, drag,
-  };
-  /* eslint-enable @typescript-eslint/no-unused-vars */
-  // PersonSimNode, SimulationNode, SimulationEdge are type-only imports —
-  // TypeScript does not error on unused type imports.
+  // Step 2: Simulation builder
+  const buildSimulation = useCallback((nodes: SimulationNode[], edges: SimulationEdge[]) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mobileLinkDistance = isMobile ? 80 : linkDistance;
+    const mobileChargeStrength = isMobile ? -250 : chargeStrength;
+    const collisionRadius = clusteringEnabled ? (isMobile ? 40 : 50) : (isMobile ? 25 : 30);
+
+    const sim = forceSimulation<SimulationNode>(nodes)
+      .force('link', forceLink<SimulationNode, SimulationEdge>(edges)
+        .id((d) => d.id)
+        .distance(mobileLinkDistance))
+      .force('charge', forceManyBody().strength(
+        clusteringEnabled ? mobileChargeStrength * 1.5 : mobileChargeStrength,
+      ))
+      .force('center', forceCenter(width / 2, height / 2))
+      .force('collision', forceCollide().radius(collisionRadius));
+
+    if (clusteringEnabled) {
+      const uniqueGroupIds = Array.from(new Set(nodes.flatMap((n) => n.kind === 'person' ? n.groups : []))).filter(Boolean);
+      const clusterRadius = Math.min(width, height) * 0.35;
+      const clusterCenters = new Map<string, { x: number; y: number }>();
+      uniqueGroupIds.forEach((groupId, index) => {
+        const angle = (2 * Math.PI * index) / uniqueGroupIds.length - Math.PI / 2;
+        clusterCenters.set(groupId, {
+          x: width / 2 + clusterRadius * Math.cos(angle),
+          y: height / 2 + clusterRadius * Math.sin(angle),
+        });
+      });
+      const target = (d: SimulationNode) => {
+        if (d.kind !== 'person') return null;
+        if (d.isCenter || d.groups.length === 0) return null;
+        return clusterCenters.get(d.groups[0]) ?? null;
+      };
+      sim
+        .force('clusterX', forceX<SimulationNode>((d) => target(d)?.x ?? width / 2)
+          .strength((d) => (target(d) ? clusterStrength : 0)))
+        .force('clusterY', forceY<SimulationNode>((d) => target(d)?.y ?? height / 2)
+          .strength((d) => (target(d) ? clusterStrength : 0)));
+    }
+
+    sim.on('tick', () => {
+      quadtreeRef.current = buildQuadtree(nodes);
+      requestPaint();
+    });
+
+    return sim;
+  }, [isMobile, linkDistance, chargeStrength, clusteringEnabled, clusterStrength, requestPaint]);
+
+  // Step 3: Data-fetch effect
+  useEffect(() => {
+    if (!canvasRef.current || !apiEndpoint) return;
+
+    let cancelled = false;
+
+    const fetchData = async () => {
+      const url = new URL(apiEndpoint, window.location.origin);
+      url.searchParams.set('groupMatchOperator', includeMode);
+      if (includeGroupIds.length > 0) url.searchParams.set('includeGroupIds', includeGroupIds.join(','));
+      if (excludeGroupIds.length > 0) url.searchParams.set('excludeGroupIds', excludeGroupIds.join(','));
+
+      const response = await fetch(url.toString());
+      const data = await response.json() as { nodes: Omit<PersonSimNode, 'kind'>[]; edges: SimulationEdge[] };
+
+      if (cancelled) return;
+
+      const incomingNodes: SimulationNode[] = data.nodes.map((n) => ({ ...n, kind: 'person' }));
+      const incomingEdges: SimulationEdge[] = data.edges;
+
+      const { nodes, edges } = diffSimulationData(
+        nodesRef.current,
+        incomingNodes,
+        edgesRef.current,
+        incomingEdges,
+      );
+      nodesRef.current = nodes;
+      edgesRef.current = edges;
+
+      simRef.current?.stop();
+      const sim = buildSimulation(nodes, edges);
+      if (sim) {
+        sim.alpha(0.3).restart();
+        simRef.current = sim;
+      }
+    };
+
+    fetchData();
+    return () => { cancelled = true; };
+  }, [apiEndpoint, refreshKey, includeMode, includeGroupIds, excludeGroupIds, clusteringEnabled, buildSimulation]);
+
+  // Step 4: Zoom, click, hover, and drag handlers
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const zoomBehavior = zoom<HTMLCanvasElement, unknown>()
+      .scaleExtent([0.1, 3])
+      .on('zoom', (event) => {
+        transformRef.current = event.transform;
+        requestPaint();
+      });
+    zoomBehaviorRef.current = zoomBehavior;
+    select(canvas).call(zoomBehavior);
+
+    const toGraphCoords = (clientX: number, clientY: number): [number, number] => {
+      const rect = canvas.getBoundingClientRect();
+      const xPx = clientX - rect.left;
+      const yPx = clientY - rect.top;
+      const t = transformRef.current;
+      return [(xPx - t.x) / t.k, (yPx - t.y) / t.k];
+    };
+
+    const nodeAt = (clientX: number, clientY: number): SimulationNode | undefined => {
+      const tree = quadtreeRef.current;
+      if (!tree) return undefined;
+      const [gx, gy] = toGraphCoords(clientX, clientY);
+      return findNodeAtPoint(tree, gx, gy, isMobile ? 18 : 22);
+    };
+
+    const onMove = (event: MouseEvent) => {
+      const node = nodeAt(event.clientX, event.clientY);
+      const id = node?.id ?? null;
+      if (hoveredNodeIdRef.current !== id) {
+        hoveredNodeIdRef.current = id;
+        canvas.style.cursor = id ? 'pointer' : 'default';
+        requestPaint();
+      }
+    };
+
+    const onClick = (event: MouseEvent) => {
+      const node = nodeAt(event.clientX, event.clientY);
+      if (!node) return;
+      if (node.kind !== 'person') return;
+      if (centerNodeNonClickable && node.isCenter) return;
+      if (node.id.startsWith('user-')) router.push('/dashboard');
+      else router.push(`/people/${node.id}`);
+    };
+
+    const drag_ = drag<HTMLCanvasElement, unknown>()
+      .container(canvas)
+      .subject((event) => {
+        const node = nodeAt(event.sourceEvent.clientX, event.sourceEvent.clientY);
+        return node ?? null;
+      })
+      .on('start', (event) => {
+        const d = event.subject as SimulationNode | null;
+        if (!d) return;
+        if (!event.active && simRef.current) simRef.current.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      })
+      .on('drag', (event) => {
+        const d = event.subject as SimulationNode | null;
+        if (!d) return;
+        const [gx, gy] = toGraphCoords(event.sourceEvent.clientX, event.sourceEvent.clientY);
+        d.fx = gx;
+        d.fy = gy;
+      })
+      .on('end', (event) => {
+        const d = event.subject as SimulationNode | null;
+        if (!d) return;
+        if (!event.active && simRef.current) simRef.current.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      });
+
+    select(canvas).call(drag_);
+
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('click', onClick);
+
+    return () => {
+      canvas.removeEventListener('mousemove', onMove);
+      canvas.removeEventListener('click', onClick);
+      select(canvas).on('.zoom', null);
+      select(canvas).on('.drag', null);
+    };
+  }, [centerNodeNonClickable, isMobile, requestPaint, router]);
+
+  // loadPhoto is used indirectly via getCachedPhoto callbacks in paintFrame;
+  // reference it here to keep the import from being flagged by linters.
+  void loadPhoto;
+  // capitalizeType is reserved for future label rendering use.
+  void capitalizeType;
 
   return (
     <div className="w-full h-full">
