@@ -423,6 +423,8 @@ export default function UnifiedNetworkGraph({
       : rawEdges;
 
     const { nodes, edges } = diffSimulationData(nodesRef.current, incomingNodes, edgesRef.current, incomingEdges);
+    const ghost = nodes.find((n) => n.kind === 'bubble' && n.isExpanded);
+    if (ghost) console.debug('[graph] post-diff ghost', { id: ghost.id, fx: ghost.fx, fy: ghost.fy, x: ghost.x, y: ghost.y });
     nodesRef.current = nodes;
     edgesRef.current = edges;
 
@@ -431,6 +433,12 @@ export default function UnifiedNetworkGraph({
     if (sim) {
       sim.alpha(0.3).restart();
       simRef.current = sim;
+      // Log first tick's ghost state
+      sim.on('tick.debug', () => {
+        const g = nodes.find((n) => n.kind === 'bubble' && n.isExpanded);
+        if (g) console.debug('[graph] tick ghost', { id: g.id, fx: g.fx, fy: g.fy, x: g.x, y: g.y });
+        sim.on('tick.debug', null);
+      });
     }
   }, [
     groups, localGraphMode, graphBubbleThreshold, expandedBubbles,
@@ -550,6 +558,7 @@ export default function UnifiedNetworkGraph({
             node.fy = targetY;
             node.vx = 0;
             node.vy = 0;
+            console.debug('[graph] pin bubble', { id: node.id, fx: node.fx, fy: node.fy, x: node.x, y: node.y });
 
             const bubbleId = node.id;
             window.setTimeout(() => {
