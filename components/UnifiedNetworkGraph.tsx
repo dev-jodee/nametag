@@ -584,7 +584,7 @@ export default function UnifiedNetworkGraph({
                   ghost.fy = null;
                 }
               }, 1500);
-            }, 1000);
+            }, 500);
           }
         }
         return;
