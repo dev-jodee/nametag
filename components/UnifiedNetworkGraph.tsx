@@ -331,12 +331,16 @@ export default function UnifiedNetworkGraph({
       .force('center', forceCenter(width / 2, height / 2))
       // Stronger pull for "you" anchors it at canvas-center under normal forces,
       // while still letting the user drag it around for fun.
-      .force('centerX', forceX<SimulationNode>(width / 2).strength((d) =>
-        d.kind === 'person' && d.isCenter ? 0.5 : 0.15
-      ))
-      .force('centerY', forceY<SimulationNode>(height / 2).strength((d) =>
-        d.kind === 'person' && d.isCenter ? 0.5 : 0.15
-      ))
+      .force('centerX', forceX<SimulationNode>(width / 2).strength((d) => {
+        if (d.kind === 'person' && d.isCenter) return 0.5;
+        if (d.kind === 'bubble' && d.isExpanded) return 0;
+        return 0.15;
+      }))
+      .force('centerY', forceY<SimulationNode>(height / 2).strength((d) => {
+        if (d.kind === 'person' && d.isCenter) return 0.5;
+        if (d.kind === 'bubble' && d.isExpanded) return 0;
+        return 0.15;
+      }))
       .force('collision', forceCollide<SimulationNode>().radius(collisionForNode))
       .force('expandedCluster', expandedClusterField);
 
@@ -423,8 +427,6 @@ export default function UnifiedNetworkGraph({
       : rawEdges;
 
     const { nodes, edges } = diffSimulationData(nodesRef.current, incomingNodes, edgesRef.current, incomingEdges);
-    const ghost = nodes.find((n) => n.kind === 'bubble' && n.isExpanded);
-    if (ghost) console.debug('[graph] post-diff ghost', { id: ghost.id, fx: ghost.fx, fy: ghost.fy, x: ghost.x, y: ghost.y });
     nodesRef.current = nodes;
     edgesRef.current = edges;
 
@@ -433,15 +435,6 @@ export default function UnifiedNetworkGraph({
     if (sim) {
       sim.alpha(0.3).restart();
       simRef.current = sim;
-      // Log every 30th tick's ghost state to see if fx/fy persists
-      let tickCount = 0;
-      sim.on('tick.debug', () => {
-        tickCount++;
-        if (tickCount % 30 === 0 || tickCount === 1) {
-          const g = nodes.find((n) => n.kind === 'bubble' && n.isExpanded);
-          if (g) console.debug(`[graph] tick ${tickCount} ghost`, { fx: g.fx, fy: g.fy, x: g.x, y: g.y });
-        }
-      });
     }
   }, [
     groups, localGraphMode, graphBubbleThreshold, expandedBubbles,
@@ -555,30 +548,12 @@ export default function UnifiedNetworkGraph({
             const targetX = center.x + dx * ratio;
             const targetY = center.y + dy * ratio;
 
-            console.debug('[graph] click bubble', {
-              id: node.id,
-              memberCount: node.memberCount,
-              from: { x: node.x, y: node.y },
-              to: { x: targetX, y: targetY },
-              dist, targetDist, finalDist, ratio,
-              center: { x: center.x, y: center.y },
-            });
             node.x = targetX;
             node.y = targetY;
             node.fx = targetX;
             node.fy = targetY;
             node.vx = 0;
             node.vy = 0;
-
-            const bubbleId = node.id;
-            window.setTimeout(() => {
-              const ghost = nodesRef.current.find((n) => n.id === bubbleId);
-              if (ghost) {
-                ghost.fx = null;
-                ghost.fy = null;
-                if (simRef.current) simRef.current.alpha(0.2).restart();
-              }
-            }, 2000);
           }
         }
         setExpandedBubbles((prev) => {
