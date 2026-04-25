@@ -249,12 +249,82 @@ export default function UnifiedNetworkGraph({
     };
 
     const membershipLinkDistance = isMobile ? 22 : 32;
+
+    // Custom force: each expanded ghost behaves like an "invisible big bubble".
+    // Members get strongly pulled toward the ghost (orbiting close to it);
+    // non-members get pushed out of the ghost's domain so the cluster reads
+    // as a coherent island.
+    const expandedClusterField = (() => {
+      const tightenStrength = 0.35;
+      const repelStrength = 0.5;
+      const padding = isMobile ? 18 : 24;
+      const memberRadius = isMobile ? 12 : 14;
+      let attached: SimulationNode[] = [];
+      const memberToGhostId = new Map<string, string>();
+
+      const force = (alpha: number) => {
+        // Build per-ghost domain (ghost position + radius + member set + protected ids)
+        type Domain = { ghostId: string; x: number; y: number; r: number; protectedIds: Set<string> };
+        const domains: Domain[] = [];
+        for (const n of attached) {
+          if (n.kind !== 'bubble' || !n.isExpanded || n.x === undefined) continue;
+          const r = Math.sqrt(Math.max(n.memberCount, 1)) * memberRadius * 1.2 + padding;
+          const protectedIds = new Set<string>([n.id, ...n.memberIds]);
+          domains.push({ ghostId: n.id, x: n.x, y: n.y ?? 0, r, protectedIds });
+        }
+        if (domains.length === 0) return;
+
+        // Tighten each expanded member toward its ghost
+        for (const node of attached) {
+          if (node.kind !== 'person') continue;
+          const ghostId = memberToGhostId.get(node.id);
+          if (!ghostId) continue;
+          const dom = domains.find((d) => d.ghostId === ghostId);
+          if (!dom || node.x === undefined) continue;
+          const dx = dom.x - (node.x ?? 0);
+          const dy = dom.y - (node.y ?? 0);
+          node.vx = (node.vx ?? 0) + dx * tightenStrength * alpha;
+          node.vy = (node.vy ?? 0) + dy * tightenStrength * alpha;
+        }
+
+        // Push non-members out of each domain
+        for (const dom of domains) {
+          for (const node of attached) {
+            if (dom.protectedIds.has(node.id)) continue;
+            if (node.x === undefined) continue;
+            const dx = (node.x ?? 0) - dom.x;
+            const dy = (node.y ?? 0) - dom.y;
+            const d = Math.hypot(dx, dy);
+            if (d > 0 && d < dom.r) {
+              const push = ((dom.r - d) / dom.r) * repelStrength * alpha;
+              node.vx = (node.vx ?? 0) + (dx / d) * push * dom.r;
+              node.vy = (node.vy ?? 0) + (dy / d) * push * dom.r;
+            }
+          }
+        }
+      };
+
+      force.initialize = (n: SimulationNode[]) => {
+        attached = n;
+        memberToGhostId.clear();
+        for (const node of n) {
+          if (node.kind === 'bubble' && node.isExpanded) {
+            for (const memberId of node.memberIds) {
+              memberToGhostId.set(memberId, node.id);
+            }
+          }
+        }
+      };
+
+      return force;
+    })();
+
     const sim = forceSimulation<SimulationNode>(nodes)
       .velocityDecay(0.6)
       .force('link', forceLink<SimulationNode, SimulationEdge>(edges)
         .id((d) => d.id)
         .distance((e) => e.type === 'membership' ? membershipLinkDistance : mobileLinkDistance)
-        .strength((e) => e.type === 'membership' ? 0.7 : 1))
+        .strength((e) => e.type === 'membership' ? 0.4 : 1))
       .force('charge', forceManyBody().strength(
         clusteringEnabled ? mobileChargeStrength * 1.5 : mobileChargeStrength,
       ))
@@ -267,7 +337,8 @@ export default function UnifiedNetworkGraph({
       .force('centerY', forceY<SimulationNode>(height / 2).strength((d) =>
         d.kind === 'person' && d.isCenter ? 0.5 : 0.15
       ))
-      .force('collision', forceCollide<SimulationNode>().radius(collisionForNode));
+      .force('collision', forceCollide<SimulationNode>().radius(collisionForNode))
+      .force('expandedCluster', expandedClusterField);
 
     if (clusteringEnabled) {
       const uniqueGroupIds = Array.from(new Set(nodes.flatMap((n) => n.kind === 'person' ? n.groups : []))).filter(Boolean);
