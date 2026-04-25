@@ -433,11 +433,14 @@ export default function UnifiedNetworkGraph({
     if (sim) {
       sim.alpha(0.3).restart();
       simRef.current = sim;
-      // Log first tick's ghost state
+      // Log every 30th tick's ghost state to see if fx/fy persists
+      let tickCount = 0;
       sim.on('tick.debug', () => {
-        const g = nodes.find((n) => n.kind === 'bubble' && n.isExpanded);
-        if (g) console.debug('[graph] tick ghost', { id: g.id, fx: g.fx, fy: g.fy, x: g.x, y: g.y });
-        sim.on('tick.debug', null);
+        tickCount++;
+        if (tickCount % 30 === 0 || tickCount === 1) {
+          const g = nodes.find((n) => n.kind === 'bubble' && n.isExpanded);
+          if (g) console.debug(`[graph] tick ${tickCount} ghost`, { fx: g.fx, fy: g.fy, x: g.x, y: g.y });
+        }
       });
     }
   }, [
@@ -552,13 +555,20 @@ export default function UnifiedNetworkGraph({
             const targetX = center.x + dx * ratio;
             const targetY = center.y + dy * ratio;
 
+            console.debug('[graph] click bubble', {
+              id: node.id,
+              memberCount: node.memberCount,
+              from: { x: node.x, y: node.y },
+              to: { x: targetX, y: targetY },
+              dist, targetDist, finalDist, ratio,
+              center: { x: center.x, y: center.y },
+            });
             node.x = targetX;
             node.y = targetY;
             node.fx = targetX;
             node.fy = targetY;
             node.vx = 0;
             node.vy = 0;
-            console.debug('[graph] pin bubble', { id: node.id, fx: node.fx, fy: node.fy, x: node.x, y: node.y });
 
             const bubbleId = node.id;
             window.setTimeout(() => {
