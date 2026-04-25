@@ -680,6 +680,7 @@
       },
       "showAsGroups": "Mostrar como grupos",
       "showIndividuals": "Mostrar personas",
+      "collapseAllGroups": "Contraer todos los grupos",
       "unsortedBubbleLabel": "Sin grupo"
     }
   },

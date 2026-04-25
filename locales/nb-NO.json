@@ -680,6 +680,7 @@
       },
       "showAsGroups": "Vis som grupper",
       "showIndividuals": "Vis enkeltvis",
+      "collapseAllGroups": "Lukk alle grupper",
       "unsortedBubbleLabel": "Uten gruppe"
     }
   },

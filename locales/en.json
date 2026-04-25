@@ -680,6 +680,7 @@
       },
       "showAsGroups": "Show as groups",
       "showIndividuals": "Show individuals",
+      "collapseAllGroups": "Collapse all groups",
       "unsortedBubbleLabel": "Unsorted"
     }
   },

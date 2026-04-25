@@ -680,6 +680,7 @@
       },
       "showAsGroups": "グループで表示",
       "showIndividuals": "個別に表示",
+      "collapseAllGroups": "すべてのグループを折りたたむ",
       "unsortedBubbleLabel": "未分類"
     }
   },

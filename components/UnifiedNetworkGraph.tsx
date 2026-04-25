@@ -614,33 +614,58 @@ export default function UnifiedNetworkGraph({
             }) === 'bubbles';
             const label = bubblesActive ? t('showIndividuals') : t('showAsGroups');
             return (
-              <button
-                onClick={async () => {
-                  const next: 'individuals' | 'bubbles' = bubblesActive ? 'individuals' : 'bubbles';
-                  setLocalGraphMode(next);
-                  try {
-                    await fetch('/api/user/graph-display', {
-                      method: 'PUT',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ graphMode: next }),
-                    });
-                  } catch {
-                    // Silent fail — local state is source of truth until next page load.
-                  }
-                }}
-                className={`p-3 border rounded-lg transition-colors ${
-                  bubblesActive
-                    ? 'bg-primary/20 border-primary/40 dark:bg-primary dark:border-primary'
-                    : 'bg-surface border-border hover:bg-surface-elevated'
-                }`}
-                aria-label={label}
-                title={label}
-              >
-                <svg className="w-5 h-5 text-primary dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <circle cx="8" cy="8" r="4" strokeWidth="2"/>
-                  <circle cx="16" cy="16" r="4" strokeWidth="2"/>
-                </svg>
-              </button>
+              <>
+                <button
+                  onClick={async () => {
+                    const next: 'individuals' | 'bubbles' = bubblesActive ? 'individuals' : 'bubbles';
+                    setLocalGraphMode(next);
+                    try {
+                      await fetch('/api/user/graph-display', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ graphMode: next }),
+                      });
+                    } catch {
+                      // Silent fail — local state is source of truth until next page load.
+                    }
+                  }}
+                  className={`p-3 border rounded-lg transition-colors ${
+                    bubblesActive
+                      ? 'bg-primary/20 border-primary/40 dark:bg-primary dark:border-primary'
+                      : 'bg-surface border-border hover:bg-surface-elevated'
+                  }`}
+                  aria-label={label}
+                  title={label}
+                >
+                  <svg className="w-5 h-5 text-primary dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="8" cy="8" r="4" strokeWidth="2"/>
+                    <circle cx="16" cy="16" r="4" strokeWidth="2"/>
+                  </svg>
+                </button>
+                {bubblesActive && expandedBubbles.size > 0 && (
+                  <button
+                    onClick={() => setExpandedBubbles(new Set())}
+                    className="p-3 bg-surface border border-border rounded-lg hover:bg-surface-elevated transition-colors"
+                    aria-label={t('collapseAllGroups')}
+                    title={t('collapseAllGroups')}
+                  >
+                    <svg
+                      className="w-5 h-5 text-primary dark:text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <polyline points="4 14 10 14 10 20" />
+                      <polyline points="20 10 14 10 14 4" />
+                      <line x1="14" y1="10" x2="21" y2="3" />
+                      <line x1="3" y1="21" x2="10" y2="14" />
+                    </svg>
+                  </button>
+                )}
+              </>
             );
           })()}
           <button

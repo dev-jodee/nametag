@@ -680,6 +680,7 @@
       },
       "showAsGroups": "按组显示",
       "showIndividuals": "单独显示",
+      "collapseAllGroups": "收起所有组",
       "unsortedBubbleLabel": "未分组"
     }
   },
