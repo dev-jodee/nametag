@@ -128,8 +128,6 @@ export default async function DashboardPage() {
                 apiEndpoint="/api/dashboard/graph"
                 groups={groups}
                 centerNodeNonClickable={true}
-                linkDistance={120}
-                chargeStrength={-400}
                 graphMode={(user?.graphMode === 'individuals' || user?.graphMode === 'bubbles') ? user.graphMode : null}
                 graphBubbleThreshold={user?.graphBubbleThreshold ?? 50}
               />

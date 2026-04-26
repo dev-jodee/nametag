@@ -47,7 +47,7 @@ export default function UnifiedNetworkGraph({
   apiEndpoint,
   groups,
   centerNodeNonClickable = false,
-  linkDistance = 120,
+  linkDistance = 160,
   chargeStrength = -400,
   refreshKey,
   graphMode: graphModeProp = null,
@@ -233,9 +233,9 @@ export default function UnifiedNetworkGraph({
     const rect = canvas.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
-    const mobileLinkDistance = isMobile ? 80 : linkDistance;
+    const mobileLinkDistance = isMobile ? 110 : linkDistance;
     const mobileChargeStrength = isMobile ? -250 : chargeStrength;
-    const personCollisionR = isMobile ? 25 : 30;
+    const personCollisionR = isMobile ? 38 : 52;
 
     // Visible-radius-aware collision so bubbles don't overlap "you" or each other.
     const collisionForNode = (d: SimulationNode): number => {
