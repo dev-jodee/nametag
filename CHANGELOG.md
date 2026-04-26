@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.43.3](https://github.com/mattogodoy/nametag/compare/v0.43.2...v0.43.3) (2026-04-26)
+
+
+### Bug Fixes
+
+* **carddav:** recover from server-deleted contacts instead of looping forever ([0f2248a](https://github.com/mattogodoy/nametag/commit/0f2248aa248ab865836a25b15bb722e20800ec88))
+* **carddav:** recover from server-deleted contacts instead of looping forever ([c3784d8](https://github.com/mattogodoy/nametag/commit/c3784d8bc4bb8569d222381c998ecd628e9d7a78))
+* **carddav:** use item grouping for non-standard EMAIL/TEL/ADR labels ([161de9f](https://github.com/mattogodoy/nametag/commit/161de9fe146843ab221caa49b024f9052e82b095))
+* **carddav:** use item grouping for non-standard EMAIL/TEL/ADR labels ([bd71618](https://github.com/mattogodoy/nametag/commit/bd716188ea1d6c687401ec44d18d196dcfc6fa26))
+
 ## [0.43.2](https://github.com/mattogodoy/nametag/compare/v0.43.1...v0.43.2) (2026-04-22)
 
 
