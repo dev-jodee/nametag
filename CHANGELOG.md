@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.44.1](https://github.com/mattogodoy/nametag/compare/v0.44.0...v0.44.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* **graph:** photos render at default zoom, no more black-circle stub ([341fa6a](https://github.com/mattogodoy/nametag/commit/341fa6af8573a01ca55f92af51fa217fe50d6b66))
+* **graph:** photos render at default zoom, no more black-circle stub ([0bf19f1](https://github.com/mattogodoy/nametag/commit/0bf19f108cee36bb876dc95214a725858fdb46ea))
+
 ## [0.44.0](https://github.com/mattogodoy/nametag/compare/v0.43.3...v0.44.0) (2026-04-28)
 
 
