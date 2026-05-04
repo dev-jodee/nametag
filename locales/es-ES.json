@@ -898,6 +898,7 @@
       "clearLastContact": "Eliminar fecha de último contacto",
       "sectionImportantDates": "Fechas Importantes",
       "sectionNotes": "Notas",
+      "sectionCustomFields": "Campos personalizados",
       "nameLabel": "Nombre",
       "nameRequired": "Nombre *",
       "surnameLabel": "Apellido",

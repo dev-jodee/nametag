@@ -898,6 +898,7 @@
       "clearLastContact": "移除最后联系日期",
       "sectionImportantDates": "重要日期",
       "sectionNotes": "备注",
+      "sectionCustomFields": "自定义字段",
       "nameLabel": "名称",
       "nameRequired": "名称 *",
       "surnameLabel": "姓氏",

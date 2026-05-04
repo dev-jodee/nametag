@@ -898,6 +898,7 @@
       "clearLastContact": "Remove last contact date",
       "sectionImportantDates": "Important Dates",
       "sectionNotes": "Notes",
+      "sectionCustomFields": "Custom fields",
       "nameLabel": "Name",
       "nameRequired": "Name *",
       "surnameLabel": "Last Name",

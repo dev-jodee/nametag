@@ -898,6 +898,7 @@
       "clearLastContact": "最終連絡日を削除",
       "sectionImportantDates": "重要な日付",
       "sectionNotes": "メモ",
+      "sectionCustomFields": "カスタムフィールド",
       "nameLabel": "名前",
       "nameRequired": "名前 *",
       "surnameLabel": "姓",

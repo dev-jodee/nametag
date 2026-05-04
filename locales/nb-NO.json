@@ -898,6 +898,7 @@
       "clearLastContact": "Fjern siste kontaktdato",
       "sectionImportantDates": "Viktige datoer",
       "sectionNotes": "Notater",
+      "sectionCustomFields": "Egendefinerte felt",
       "nameLabel": "Navn",
       "nameRequired": "Navn *",
       "surnameLabel": "Etternavn",
