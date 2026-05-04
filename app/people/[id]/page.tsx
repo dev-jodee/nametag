@@ -177,6 +177,10 @@ export default async function PersonDetailsPage({
         imHandles: true,
         locations: true,
         customFields: true,
+        customFieldValues: {
+          include: { template: true },
+          where: { template: { deletedAt: null } },
+        },
         relationshipsFrom: {
           where: {
             deletedAt: null,

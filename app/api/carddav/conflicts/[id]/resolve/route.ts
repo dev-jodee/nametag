@@ -49,6 +49,10 @@ export const POST = withLogging(async function POST(request: Request, context: R
                 imHandles: true,
                 locations: true,
                 customFields: true,
+                customFieldValues: {
+                  include: { template: true },
+                  where: { template: { deletedAt: null } },
+                },
               },
             },
             connection: true,

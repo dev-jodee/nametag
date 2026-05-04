@@ -52,6 +52,10 @@ export async function autoExportPerson(personId: string): Promise<void> {
       imHandles: true,
       locations: true,
       customFields: true,
+      customFieldValues: {
+        include: { template: true },
+        where: { template: { deletedAt: null } },
+      },
       importantDates: true,
       relationshipsFrom: {
         where: { deletedAt: null },
@@ -247,6 +251,10 @@ export async function autoUpdatePerson(personId: string): Promise<void> {
       imHandles: true,
       locations: true,
       customFields: true,
+      customFieldValues: {
+        include: { template: true },
+        where: { template: { deletedAt: null } },
+      },
       importantDates: true,
       relationshipsFrom: {
         where: { deletedAt: null },

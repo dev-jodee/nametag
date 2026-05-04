@@ -65,6 +65,7 @@ describe('Export API', () => {
     imHandles: [],
     locations: [],
     customFields: [],
+    customFieldValues: [],
   };
 
   const nullPersonFields = {

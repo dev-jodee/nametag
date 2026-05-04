@@ -24,6 +24,10 @@ function multiValueFieldsInclude() {
     imHandles: true,
     locations: true,
     customFields: true,
+    customFieldValues: {
+      include: { template: true },
+      where: { template: { deletedAt: null } },
+    },
   } as const;
 }
 

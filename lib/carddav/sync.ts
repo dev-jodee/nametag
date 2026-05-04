@@ -495,6 +495,10 @@ export async function syncToServer(
             imHandles: true,
             locations: true,
             customFields: true,
+            customFieldValues: {
+              include: { template: true },
+              where: { template: { deletedAt: null } },
+            },
             importantDates: true,
             groups: { include: { group: true } },
             relationshipsFrom: { include: { relatedPerson: true } },
@@ -536,6 +540,7 @@ export async function syncToServer(
           importantDates: mapping.person.importantDates || [],
           relationshipsFrom: mapping.person.relationshipsFrom || [],
           groups: mapping.person.groups || [],
+          customFieldValues: mapping.person.customFieldValues || [],
         };
 
         // Load photo from file for export if needed
@@ -711,6 +716,10 @@ export async function syncToServer(
         imHandles: true,
         locations: true,
         customFields: true,
+        customFieldValues: {
+          include: { template: true },
+          where: { template: { deletedAt: null } },
+        },
         importantDates: true,
         relationshipsFrom: {
           include: { relatedPerson: true },
