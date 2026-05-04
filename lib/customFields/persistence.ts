@@ -17,6 +17,53 @@ export interface CustomFieldValueInput {
 }
 
 /**
+ * Validate customFieldValues inputs against the user's templates without persisting anything.
+ *
+ * Use this before creating a person so validation errors can be returned before any DB writes
+ * to Person occur, avoiding the need for a hard-delete rollback.
+ *
+ * Throws CustomFieldValidationError on any validation failure.
+ */
+export async function validateCustomFieldValues(
+  prisma: PrismaClientLike,
+  userId: string,
+  inputs: CustomFieldValueInput[]
+): Promise<void> {
+  if (inputs.length === 0) return;
+
+  for (const input of inputs) {
+    if (isEmptyRawValue(input.value)) {
+      throw new CustomFieldValidationError(
+        'Empty custom field values must be omitted from the request, not sent'
+      );
+    }
+  }
+
+  const templateIds = Array.from(new Set(inputs.map((i) => i.templateId)));
+  const templates = await prisma.customFieldTemplate.findMany({
+    where: {
+      id: { in: templateIds },
+      userId,
+      deletedAt: null,
+    },
+  });
+  const byId = new Map(templates.map((t) => [t.id, t]));
+
+  for (const input of inputs) {
+    const template = byId.get(input.templateId);
+    if (!template) {
+      throw new CustomFieldValidationError(
+        `Custom field template ${input.templateId} not found`
+      );
+    }
+    const result = validateRawValue(template.type, input.value, template.options);
+    if (!result.ok) {
+      throw new CustomFieldValidationError(`${template.name}: ${result.error}`);
+    }
+  }
+}
+
+/**
  * Diff and apply customFieldValues for a person.
  *
  * Behavior:
@@ -39,39 +86,8 @@ export async function applyCustomFieldValues(
     return;
   }
 
-  // Reject empty raw values — clients should omit empties, not send them
-  for (const input of inputs) {
-    if (isEmptyRawValue(input.value)) {
-      throw new CustomFieldValidationError(
-        'Empty custom field values must be omitted from the request, not sent'
-      );
-    }
-  }
-
-  // Load all referenced templates in one query, scoped to the user and active only
-  const templateIds = Array.from(new Set(inputs.map((i) => i.templateId)));
-  const templates = await prisma.customFieldTemplate.findMany({
-    where: {
-      id: { in: templateIds },
-      userId,
-      deletedAt: null,
-    },
-  });
-  const byId = new Map(templates.map((t) => [t.id, t]));
-
-  // Validate every entry
-  for (const input of inputs) {
-    const template = byId.get(input.templateId);
-    if (!template) {
-      throw new CustomFieldValidationError(
-        `Custom field template ${input.templateId} not found`
-      );
-    }
-    const result = validateRawValue(template.type, input.value, template.options);
-    if (!result.ok) {
-      throw new CustomFieldValidationError(`${template.name}: ${result.error}`);
-    }
-  }
+  // Validate first — throws CustomFieldValidationError on any failure
+  await validateCustomFieldValues(prisma, userId, inputs);
 
   // Apply: delete templates no longer in the set + upsert each provided value, in one transaction
   const incomingIds = inputs.map((i) => i.templateId);

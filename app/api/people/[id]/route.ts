@@ -110,6 +110,20 @@ export const PUT = withAuth(async (request, session, context) => {
       // Otherwise already a filename — keep as-is
     }
 
+    // Apply custom field values BEFORE calling updatePerson so that autoUpdatePerson
+    // (which fires inside the service as a background task) reads the fresh values
+    // and the exported vCard is complete.
+    if (validation.data.customFieldValues !== undefined) {
+      try {
+        await applyCustomFieldValues(prisma, session.user.id, id, validation.data.customFieldValues);
+      } catch (err) {
+        if (err instanceof CustomFieldValidationError) {
+          return apiResponse.error(err.message);
+        }
+        throw err;
+      }
+    }
+
     // Delegate the DB write (and CardDAV normal-update path) to the service.
     // The service calls autoUpdatePerson when sync is not disabled.
     const serviceData = resolvedPhoto !== photo
@@ -120,18 +134,6 @@ export const PUT = withAuth(async (request, session, context) => {
 
     if (!person) {
       return apiResponse.notFound('Person not found');
-    }
-
-    // Apply custom field values if provided (undefined = no-op, [] = clear all)
-    if (validation.data.customFieldValues !== undefined) {
-      try {
-        await applyCustomFieldValues(prisma, session.user.id, id, validation.data.customFieldValues);
-      } catch (err) {
-        if (err instanceof CustomFieldValidationError) {
-          return apiResponse.error(err.message);
-        }
-        throw err;
-      }
     }
 
     // CardDAV sync logic for toggle state changes not handled by the service:

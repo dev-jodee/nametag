@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   updatePerson: vi.fn(),
   // Persistence
   applyCustomFieldValues: vi.fn(),
+  validateCustomFieldValues: vi.fn(),
 }));
 
 // Mock Prisma
@@ -74,6 +75,7 @@ vi.mock('../../lib/customFields/persistence', async (importOriginal) => {
   return {
     ...actual,
     applyCustomFieldValues: mocks.applyCustomFieldValues,
+    validateCustomFieldValues: mocks.validateCustomFieldValues,
   };
 });
 
@@ -132,8 +134,9 @@ const mockPerson = {
 describe('People API — custom field values integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Default: applyCustomFieldValues resolves successfully
+    // Default: both persistence functions resolve successfully
     mocks.applyCustomFieldValues.mockResolvedValue(undefined);
+    mocks.validateCustomFieldValues.mockResolvedValue(undefined);
     // Default: importantDate.count returns 0
     mocks.importantDateCount.mockResolvedValue(0);
   });
@@ -187,12 +190,12 @@ describe('People API — custom field values integration', () => {
       expect(mocks.applyCustomFieldValues).not.toHaveBeenCalled();
     });
 
-    it('returns 400 and soft-rollbacks the person when applyCustomFieldValues throws CustomFieldValidationError', async () => {
-      mocks.createPerson.mockResolvedValue({ ...mockPerson });
-      mocks.applyCustomFieldValues.mockRejectedValue(
+    it('returns 400 BEFORE creating the person when customFieldValues fail validation', async () => {
+      // The route now calls validateCustomFieldValues before createPerson.
+      // Simulate a validation failure from that pre-create check.
+      mocks.validateCustomFieldValues.mockRejectedValue(
         new CustomFieldValidationError('Diet: NOT_IN_OPTIONS')
       );
-      mocks.personDelete.mockResolvedValue(mockPerson);
 
       const request = new Request('http://localhost/api/people', {
         method: 'POST',
@@ -210,10 +213,10 @@ describe('People API — custom field values integration', () => {
       expect(response.status).toBe(400);
       expect(body.error).toContain('Diet: NOT_IN_OPTIONS');
 
-      // Soft-rollback: person.delete must have been called with the created person's id
-      expect(mocks.personDelete).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { id: PERSON_ID } })
-      );
+      // The person must NOT have been created — no rollback needed
+      expect(mocks.createPerson).not.toHaveBeenCalled();
+      // person.delete must NOT be called — no rollback hard-delete
+      expect(mocks.personDelete).not.toHaveBeenCalled();
     });
   });
 
