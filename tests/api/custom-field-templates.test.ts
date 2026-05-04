@@ -46,6 +46,7 @@ vi.mock('../../lib/billing', () => ({
 // Import after mocking
 import { GET as listGET, POST } from '../../app/api/custom-field-templates/route';
 import { GET as singleGET, PUT, DELETE } from '../../app/api/custom-field-templates/[id]/route';
+import { PUT as reorderPUT } from '../../app/api/custom-field-templates/reorder/route';
 import { canCreateResource } from '../../lib/billing';
 
 const mockCanCreateResource = vi.mocked(canCreateResource);
@@ -532,6 +533,103 @@ describe('Custom Field Templates API', () => {
 
       expect(response.status).toBe(404);
       expect(body.error).toBeDefined();
+    });
+  });
+
+  // ─── PUT /api/custom-field-templates/reorder ────────────────────────────────
+
+  describe('PUT /api/custom-field-templates/reorder', () => {
+    it('reorders templates and returns 200 with { success: true }', async () => {
+      const id1 = 'c1111111111111111111111a';
+      const id2 = 'c2222222222222222222222a';
+      const id3 = 'c3333333333333333333333a';
+
+      const a = { id: id1, userId: 'user-123' };
+      const b = { id: id2, userId: 'user-123' };
+      const c = { id: id3, userId: 'user-123' };
+
+      // Mock findMany returns all 3 ids owned by user
+      mocks.templateFindMany.mockResolvedValue([a, b, c]);
+
+      // Mock transaction with update calls
+      mocks.transaction.mockImplementation(
+        async (updates: Array<any>) => {
+          // Simulate transaction executing updates
+          return Promise.all(updates.map((u) => u));
+        }
+      );
+
+      const request = new Request('http://localhost/api/custom-field-templates/reorder', {
+        method: 'PUT',
+        body: JSON.stringify({ ids: [id3, id1, id2] }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await reorderPUT(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.success).toBe(true);
+
+      // Verify ownership check was called
+      expect(mocks.templateFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            id: { in: [id3, id1, id2] },
+            userId: 'user-123',
+            deletedAt: null,
+          },
+          select: { id: true },
+        })
+      );
+
+      // Verify transaction was called with 3 update calls
+      expect(mocks.transaction).toHaveBeenCalled();
+      const transactionArg = (mocks.transaction as any).mock.calls[0][0];
+      expect(transactionArg).toHaveLength(3);
+    });
+
+    it('returns 400 when not all ids are owned by the user', async () => {
+      const id1 = 'c1111111111111111111111a';
+      const id2 = 'c2222222222222222222222a';
+
+      const a = { id: id1, userId: 'user-123' };
+
+      // Mock findMany returns only 1 id (not all 2)
+      mocks.templateFindMany.mockResolvedValue([a]);
+
+      const request = new Request('http://localhost/api/custom-field-templates/reorder', {
+        method: 'PUT',
+        body: JSON.stringify({ ids: [id1, id2] }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await reorderPUT(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Invalid id list');
+
+      // Verify update was NOT called
+      expect(mocks.transaction).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 when ids array is empty (validation fails)', async () => {
+      const request = new Request('http://localhost/api/custom-field-templates/reorder', {
+        method: 'PUT',
+        body: JSON.stringify({ ids: [] }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await reorderPUT(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Validation failed');
+
+      // Verify findMany was NOT called (validation should fail first)
+      expect(mocks.templateFindMany).not.toHaveBeenCalled();
+      expect(mocks.transaction).not.toHaveBeenCalled();
     });
   });
 });
