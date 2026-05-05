@@ -40,6 +40,7 @@ export const GET = withAuth(async (request, session) => {
       include: {
         relationshipToUser: true,
         groups: {
+          where: { group: { deletedAt: null } },
           include: {
             group: true,
           },
