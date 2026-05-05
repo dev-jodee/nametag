@@ -81,7 +81,13 @@ export default function CustomFieldTemplateForm({
         onSaved();
       } else {
         const data = (await res.json()) as { error?: string };
-        setError(data.error ?? tErrors('somethingWentWrong'));
+        // Map known statuses to translated strings; fall back to the API's
+        // raw message for cases we haven't mapped (already English-only).
+        if (res.status === 409) {
+          setError(tErrors('duplicateName'));
+        } else {
+          setError(data.error ?? tErrors('somethingWentWrong'));
+        }
       }
     } catch {
       setError(tErrors('cannotConnect'));

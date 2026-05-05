@@ -831,7 +831,10 @@ model CustomFieldTemplate {
   user   User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
   values PersonCustomFieldValue[]
 
-  @@unique([userId, slug])
+  // Note: uniqueness on (userId, slug) is enforced ONLY for non-deleted rows
+  // via a partial unique index defined in the migration. This lets users
+  // recreate a template with the same name after soft-deleting the previous one.
+  @@index([userId, slug])
   @@index([userId, deletedAt])
   @@map("custom_field_templates")
 }
