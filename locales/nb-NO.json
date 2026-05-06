@@ -1215,6 +1215,7 @@
       "imHandles": "IM-kontoer",
       "locations": "steder",
       "customFields": "egendefinerte felter",
+      "customFieldValues": "verdier for egendefinerte felt",
       "importantDates": "viktige datoer",
       "groups": "grupper",
       "relationships": "relasjoner",

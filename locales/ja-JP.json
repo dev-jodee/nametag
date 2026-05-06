@@ -1215,6 +1215,7 @@
       "imHandles": "IMアカウント",
       "locations": "所在地",
       "customFields": "カスタムフィールド",
+      "customFieldValues": "カスタムフィールドの値",
       "importantDates": "記念日",
       "groups": "グループ",
       "relationships": "関係",

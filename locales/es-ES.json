@@ -1215,6 +1215,7 @@
       "imHandles": "cuentas de mensajería",
       "locations": "ubicaciones",
       "customFields": "campos personalizados",
+      "customFieldValues": "valores de campos personalizados",
       "importantDates": "fechas importantes",
       "groups": "grupos",
       "relationships": "relaciones",

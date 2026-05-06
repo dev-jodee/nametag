@@ -1215,6 +1215,7 @@
       "imHandles": "IM-Konten",
       "locations": "Standorte",
       "customFields": "benutzerdefinierte Felder",
+      "customFieldValues": "Werte benutzerdefinierter Felder",
       "importantDates": "wichtige Daten",
       "groups": "Gruppen",
       "relationships": "Beziehungen",

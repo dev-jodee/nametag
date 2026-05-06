@@ -1215,6 +1215,7 @@
       "imHandles": "IM 句柄",
       "locations": "位置",
       "customFields": "自定义字段",
+      "customFieldValues": "自定义字段值",
       "importantDates": "重要日期",
       "groups": "分组",
       "relationships": "关系",
