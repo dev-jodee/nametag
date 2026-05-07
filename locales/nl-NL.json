@@ -911,6 +911,7 @@
       "clearLastContact": "Laatste contactdatum verwijderen",
       "sectionImportantDates": "Belangrijke datums",
       "sectionNotes": "Notities",
+      "sectionCustomFields": "Aangepaste velden",
       "nameLabel": "Naam",
       "nameRequired": "Naam *",
       "surnameLabel": "Achternaam",
