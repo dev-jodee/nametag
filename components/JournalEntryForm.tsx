@@ -226,14 +226,50 @@ export default function JournalEntryForm({
         <label htmlFor="journal-date" className="block text-sm font-medium text-muted mb-1">
           {t('dateLabel')}
         </label>
-        <input
-          type="date"
-          id="journal-date"
-          required
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="date"
+            id="journal-date"
+            required
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          {hasTime ? (
+            <>
+              <input
+                type="time"
+                id="journal-time"
+                aria-label={t('timeLabel')}
+                required
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setHasTime(false);
+                  setTime('');
+                }}
+                className="text-sm text-muted hover:text-foreground transition-colors"
+              >
+                {t('removeTime')}
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setHasTime(true);
+                if (!time) setTime(getCurrentTimeString());
+              }}
+              className="text-sm text-primary hover:underline"
+            >
+              + {t('addTime')}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* People */}
