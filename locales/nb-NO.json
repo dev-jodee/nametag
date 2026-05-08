@@ -1796,6 +1796,9 @@
       "save": "Lagre oppføring",
       "cancel": "Avbryt",
       "markdownSupport": "Støtter Markdown-formatering",
+      "timeLabel": "Tid",
+      "addTime": "Legg til tid",
+      "removeTime": "Fjern tid",
       "saved": "Oppføring lagret"
     },
     "detail": {

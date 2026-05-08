@@ -1796,6 +1796,9 @@
       "save": "Eintrag speichern",
       "cancel": "Abbrechen",
       "markdownSupport": "Unterstützt Markdown-Formatierung",
+      "timeLabel": "Uhrzeit",
+      "addTime": "Uhrzeit hinzufügen",
+      "removeTime": "Uhrzeit entfernen",
       "saved": "Eintrag gespeichert"
     },
     "detail": {

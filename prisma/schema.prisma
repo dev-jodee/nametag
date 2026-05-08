@@ -173,6 +173,7 @@ model JournalEntry {
   userId    String
   title     String
   date      DateTime
+  hasTime   Boolean   @default(false)
   body      String    @db.Text
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

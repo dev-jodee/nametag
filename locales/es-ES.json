@@ -1796,6 +1796,9 @@
       "save": "Guardar entrada",
       "cancel": "Cancelar",
       "markdownSupport": "Admite formato Markdown",
+      "timeLabel": "Hora",
+      "addTime": "Añadir hora",
+      "removeTime": "Quitar hora",
       "saved": "Entrada guardada"
     },
     "detail": {
