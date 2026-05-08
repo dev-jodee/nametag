@@ -1791,6 +1791,9 @@
       "save": "Save entry",
       "cancel": "Cancel",
       "markdownSupport": "Supports Markdown formatting",
+      "timeLabel": "Time",
+      "addTime": "Add time",
+      "removeTime": "Remove time",
       "saved": "Entry saved"
     },
     "detail": {

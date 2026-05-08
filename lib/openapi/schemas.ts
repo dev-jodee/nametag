@@ -451,6 +451,7 @@ export function sharedSchemas(): Record<string, unknown> {
         userId: { type: 'string', description: 'User ID' },
         title: { type: 'string', description: 'Entry title' },
         date: { type: 'string', format: 'date-time', description: 'Date of the journal entry' },
+        hasTime: { type: 'boolean', description: 'Whether the date includes a meaningful time of day (true) or is a calendar-day-only entry (false).' },
         body: { type: 'string', description: 'Entry content (markdown supported)' },
         people: {
           type: 'array',
@@ -461,7 +462,7 @@ export function sharedSchemas(): Record<string, unknown> {
         updatedAt: { type: 'string', format: 'date-time' },
         deletedAt: { type: ['string', 'null'], format: 'date-time' },
       },
-      required: ['id', 'userId', 'title', 'date', 'body', 'people', 'createdAt', 'updatedAt'],
+      required: ['id', 'userId', 'title', 'date', 'hasTime', 'body', 'people', 'createdAt', 'updatedAt'],
     },
   };
 }
