@@ -336,6 +336,7 @@ export const addGroupMemberSchema = z.object({
 export const createJournalEntrySchema = z.object({
   title: z.string().min(1, 'Title is required').max(200),
   date: z.string().min(1, 'Date is required'),
+  hasTime: z.boolean().optional().default(false),
   body: z.string().min(1, 'Entry body is required').max(50000),
   personIds: z.array(z.string()).optional().default([]),
   updateLastContact: z.boolean().optional().default(true),
@@ -344,6 +345,7 @@ export const createJournalEntrySchema = z.object({
 export const updateJournalEntrySchema = z.object({
   title: z.string().min(1, 'Title is required').max(200),
   date: z.string().min(1, 'Date is required'),
+  hasTime: z.boolean().optional().default(false),
   body: z.string().min(1, 'Entry body is required').max(50000),
   personIds: z.array(z.string()).optional().default([]),
   updateLastContact: z.boolean().optional().default(false),
