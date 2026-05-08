@@ -1212,6 +1212,7 @@
       "imHandles": "IM-accounts",
       "locations": "locaties",
       "customFields": "aangepaste velden",
+      "customFieldValues": "waarden van aangepaste velden",
       "importantDates": "belangrijke datums",
       "groups": "groepen",
       "relationships": "relaties",
@@ -1776,7 +1777,7 @@
     "filterByPerson": "Filteren op persoon",
     "allPeople": "Alle personen",
     "noEntries": "Nog geen dagboek invoeren",
-    "noEntriesDescription": "Een koffie, een familie diner, een oude vriend tegenkomen — leg de momenten vast die ertoe doen.",
+    "noEntriesDescription": "Een koffie, een familie diner, een oude vriend tegenkomen. Leg de momenten vast die ertoe doen.",
     "writeFirstEntry": "Schrijf uw eerste invoer",
     "form": {
       "titleLabel": "Titel",
@@ -1791,6 +1792,9 @@
       "save": "Invoer opslaan",
       "cancel": "Annuleren",
       "markdownSupport": "Ondersteunt Markdown opmaak",
+      "timeLabel": "Tijd",
+      "addTime": "Tijd toevoegen",
+      "removeTime": "Tijd verwijderen",
       "saved": "Invoer opgeslagen"
     },
     "detail": {
