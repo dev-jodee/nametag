@@ -24,6 +24,9 @@ export default function SyncSettingsModal({
   const [syncEnabled, setSyncEnabled] = useState(currentSettings?.syncEnabled ?? true);
   const [autoExportNew, setAutoExportNew] = useState(currentSettings?.autoExportNew ?? true);
   const [importMode, setImportMode] = useState(currentSettings?.importMode || 'manual');
+  const [cardDavNameFormat, setCardDavNameFormat] = useState(
+    currentSettings?.cardDavNameFormat || 'FULL'
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,6 +37,7 @@ export default function SyncSettingsModal({
       setSyncEnabled(currentSettings.syncEnabled);
       setAutoExportNew(currentSettings.autoExportNew);
       setImportMode(currentSettings.importMode);
+      setCardDavNameFormat(currentSettings.cardDavNameFormat || 'FULL');
       setError('');
     }
   }, [isOpen, currentSettings]);
@@ -50,6 +54,7 @@ export default function SyncSettingsModal({
           syncEnabled,
           autoExportNew,
           importMode,
+          cardDavNameFormat,
         }),
       });
 
@@ -139,6 +144,26 @@ export default function SyncSettingsModal({
             </select>
             <p className="mt-1 text-xs text-muted">
               {t('importModeHelp')}
+            </p>
+          </div>
+
+          {/* CardDAV Name Format */}
+          <div>
+            <label htmlFor="cardDavNameFormat" className="block text-sm font-medium text-foreground mb-2">
+              {t('cardDavNameFormatLabel')}
+            </label>
+            <select
+              id="cardDavNameFormat"
+              value={cardDavNameFormat}
+              onChange={(e) => setCardDavNameFormat(e.target.value)}
+              className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="FULL">{t('cardDavNameFormatFull')}</option>
+              <option value="NICKNAME_PREFERRED">{t('cardDavNameFormatNickname')}</option>
+              <option value="SHORT">{t('cardDavNameFormatShort')}</option>
+            </select>
+            <p className="mt-1 text-xs text-muted">
+              {t('cardDavNameFormatHelp')}
             </p>
           </div>
 

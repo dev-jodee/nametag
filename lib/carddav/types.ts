@@ -138,6 +138,7 @@ export interface CardDavConnectionResponse {
   syncToken: string | null;
   autoExportNew: boolean;
   importMode: string;
+  cardDavNameFormat: string;
   lastError: string | null;
   lastErrorAt: string | Date | null;
   syncInProgress: boolean;
