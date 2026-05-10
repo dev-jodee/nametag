@@ -231,6 +231,24 @@ export const PUT = withLogging(async function PUT(request: Request) {
       data: updateData,
     });
 
+    // When the name format changes, mark all synced mappings as pending
+    // so the next sync re-exports them with the updated FN field.
+    if (
+      cardDavNameFormat !== undefined &&
+      cardDavNameFormat !== existingConnection.cardDavNameFormat
+    ) {
+      await prisma.cardDavMapping.updateMany({
+        where: {
+          connectionId: existingConnection.id,
+          syncStatus: 'synced',
+        },
+        data: {
+          syncStatus: 'pending',
+          lastLocalChange: new Date(),
+        },
+      });
+    }
+
     // Return connection without password
     const { password: _, ...safeConnection } = connection;
 
