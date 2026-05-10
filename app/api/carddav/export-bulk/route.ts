@@ -56,6 +56,11 @@ export const POST = withLogging(async function POST(request: Request) {
       );
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { nameOrder: true },
+    });
+
     // Create CardDAV client
     const client = await createCardDavClient(connection);
 
@@ -146,7 +151,10 @@ export const POST = withLogging(async function POST(request: Request) {
           }
 
           // Convert to vCard
-          const vCardData = personToVCard(person);
+          const vCardData = personToVCard(person, {
+            cardDavNameFormat: connection.cardDavNameFormat,
+            nameOrder: user?.nameOrder,
+          });
 
           // Create vCard on server
           const filename = `${uid}.vcf`;

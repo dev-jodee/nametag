@@ -21,6 +21,7 @@ const mocks = vi.hoisted(() => ({
   cardDavMappingCreate: vi.fn(),
   cardDavMappingUpdate: vi.fn(),
   cardDavMappingDelete: vi.fn(),
+  userFindUnique: vi.fn(),
 
   // CardDAV client
   fetchAddressBooks: vi.fn(),
@@ -56,6 +57,9 @@ vi.mock('@/lib/prisma', () => ({
       create: mocks.cardDavMappingCreate,
       update: mocks.cardDavMappingUpdate,
       delete: mocks.cardDavMappingDelete,
+    },
+    user: {
+      findUnique: mocks.userFindUnique,
     },
   },
 }));
@@ -199,6 +203,7 @@ describe('CardDAV Auto-Export', () => {
     // Defaults
     mocks.personFindUnique.mockResolvedValue(makePerson());
     mocks.cardDavConnectionFindUnique.mockResolvedValue(makeConnection());
+    mocks.userFindUnique.mockResolvedValue({ nameOrder: 'WESTERN' });
     mocks.cardDavMappingFindUnique.mockResolvedValue(null);
     mocks.cardDavMappingCreate.mockResolvedValue({});
     mocks.cardDavMappingUpdate.mockResolvedValue({});
@@ -346,7 +351,7 @@ describe('CardDAV Auto-Export', () => {
       expect(mocks.readPhotoForExport).toHaveBeenCalledWith(USER_ID, 'photo-abc123.jpg');
       expect(mocks.personToVCard).toHaveBeenCalledWith(
         expect.anything(),
-        { photoDataUri: 'data:image/jpeg;base64,/9j/...' },
+        expect.objectContaining({ photoDataUri: 'data:image/jpeg;base64,/9j/...' }),
       );
     });
 
@@ -361,7 +366,7 @@ describe('CardDAV Auto-Export', () => {
       expect(mocks.readPhotoForExport).not.toHaveBeenCalled();
       expect(mocks.personToVCard).toHaveBeenCalledWith(
         expect.anything(),
-        { photoDataUri: undefined },
+        expect.objectContaining({ photoDataUri: undefined }),
       );
     });
 
@@ -513,7 +518,7 @@ describe('CardDAV Auto-Export', () => {
       expect(mocks.readPhotoForExport).toHaveBeenCalledWith(USER_ID, 'photo-xyz.png');
       expect(mocks.personToVCard).toHaveBeenCalledWith(
         expect.anything(),
-        { photoDataUri: 'data:image/png;base64,iVBOR...' },
+        expect.objectContaining({ photoDataUri: 'data:image/png;base64,iVBOR...' }),
       );
     });
 

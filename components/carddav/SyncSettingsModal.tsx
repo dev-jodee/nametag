@@ -24,6 +24,9 @@ export default function SyncSettingsModal({
   const [syncEnabled, setSyncEnabled] = useState(currentSettings?.syncEnabled ?? true);
   const [autoExportNew, setAutoExportNew] = useState(currentSettings?.autoExportNew ?? true);
   const [importMode, setImportMode] = useState(currentSettings?.importMode || 'manual');
+  const [cardDavNameFormat, setCardDavNameFormat] = useState(
+    currentSettings?.cardDavNameFormat || 'FULL'
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,6 +37,7 @@ export default function SyncSettingsModal({
       setSyncEnabled(currentSettings.syncEnabled);
       setAutoExportNew(currentSettings.autoExportNew);
       setImportMode(currentSettings.importMode);
+      setCardDavNameFormat(currentSettings.cardDavNameFormat || 'FULL');
       setError('');
     }
   }, [isOpen, currentSettings]);
@@ -50,6 +54,7 @@ export default function SyncSettingsModal({
           syncEnabled,
           autoExportNew,
           importMode,
+          cardDavNameFormat,
         }),
       });
 
@@ -140,6 +145,51 @@ export default function SyncSettingsModal({
             <p className="mt-1 text-xs text-muted">
               {t('importModeHelp')}
             </p>
+          </div>
+
+          {/* CardDAV Name Format */}
+          <div>
+            <span className="block text-sm font-medium text-foreground mb-2">
+              {t('cardDavNameFormatLabel')}
+            </span>
+            <div className="space-y-2">
+              {(['FULL', 'NICKNAME_PREFERRED', 'SHORT'] as const).map((value) => (
+                <label
+                  key={value}
+                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    cardDavNameFormat === value
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-muted'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="cardDavNameFormat"
+                    value={value}
+                    checked={cardDavNameFormat === value}
+                    onChange={(e) => setCardDavNameFormat(e.target.value)}
+                    className="mt-0.5 text-primary focus:ring-primary"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-foreground">
+                      {t(`cardDavNameFormat_${value}`)}
+                    </span>
+                    <p className="text-xs text-muted mt-0.5">
+                      {t(`cardDavNameFormatDesc_${value}`)}
+                    </p>
+                  </div>
+                </label>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted">
+              {t('cardDavNameFormatHelp')}
+            </p>
+            <div className="mt-2 px-3 py-2 rounded-md bg-surface-elevated text-xs text-muted">
+              {t('cardDavNameFormatExample')}{' '}
+              <span className="font-medium text-foreground">
+                {t(`cardDavNameFormatExampleValue_${cardDavNameFormat}`)}
+              </span>
+            </div>
           </div>
 
           {/* Error message */}

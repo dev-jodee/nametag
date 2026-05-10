@@ -11,6 +11,7 @@ interface ConnectionStatusProps {
   connection: CardDavConnectionResponse | null;
   pendingImportsCount: number;
   syncedContactsCount: number;
+  pendingUploadsCount: number;
   onConnectClick: () => void;
   onEditClick: () => void;
   onSettingsClick: () => void;
@@ -21,6 +22,7 @@ export default function ConnectionStatus({
   connection,
   pendingImportsCount,
   syncedContactsCount,
+  pendingUploadsCount,
   onConnectClick,
   onEditClick,
   onSettingsClick,
@@ -107,8 +109,13 @@ export default function ConnectionStatus({
       {/* Statistics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="p-4 bg-surface-elevated rounded-lg">
-          <p className="text-sm text-muted mb-1">{t('syncedContacts', { count: syncedContactsCount })}</p>
+          <p className="text-sm text-muted mb-1">{t('syncedContactsLabel')}</p>
           <p className="text-2xl font-bold text-foreground">{syncedContactsCount}</p>
+          {pendingUploadsCount > 0 && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+              {t('pendingUploads', { count: pendingUploadsCount })}
+            </p>
+          )}
         </div>
         <div className="p-4 bg-surface-elevated rounded-lg">
           <p className="text-sm text-muted mb-1">

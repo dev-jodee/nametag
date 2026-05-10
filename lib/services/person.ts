@@ -106,6 +106,7 @@ export async function createPerson(userId: string, data: PersonInput) {
     contactReminderInterval,
     contactReminderIntervalUnit,
     cardDavSyncEnabled,
+    cardDavDisplayName,
     phoneNumbers,
     emails,
     addresses,
@@ -120,6 +121,7 @@ export async function createPerson(userId: string, data: PersonInput) {
   const sanitizedMiddleName = middleName ? sanitizeName(middleName) : null;
   const sanitizedSecondLastName = secondLastName ? sanitizeName(secondLastName) : null;
   const sanitizedNickname = nickname ? sanitizeName(nickname) : null;
+  const sanitizedCardDavDisplayName = cardDavDisplayName ? sanitizeName(cardDavDisplayName) : null;
   const sanitizedNotes = notes ? sanitizeNotes(notes) : null;
 
   const person = await prisma.person.create({
@@ -144,6 +146,7 @@ export async function createPerson(userId: string, data: PersonInput) {
       contactReminderInterval: contactReminderEnabled ? contactReminderInterval : null,
       contactReminderIntervalUnit: contactReminderEnabled ? contactReminderIntervalUnit : null,
       cardDavSyncEnabled: cardDavSyncEnabled ?? true,
+      cardDavDisplayName: sanitizedCardDavDisplayName,
       groups: groupIds
         ? { create: groupIds.map((groupId) => ({ groupId })) }
         : undefined,
@@ -269,6 +272,7 @@ export async function updatePerson(id: string, userId: string, data: PersonUpdat
     contactReminderInterval,
     contactReminderIntervalUnit,
     cardDavSyncEnabled,
+    cardDavDisplayName,
     phoneNumbers,
     emails,
     addresses,
@@ -311,6 +315,11 @@ export async function updatePerson(id: string, userId: string, data: PersonUpdat
 
   if (cardDavSyncEnabled !== undefined) {
     updateData.cardDavSyncEnabled = cardDavSyncEnabled;
+  }
+
+  if (cardDavDisplayName !== undefined) {
+    const sanitized = cardDavDisplayName ? sanitizeName(cardDavDisplayName) : null;
+    updateData.cardDavDisplayName = sanitized || null;
   }
 
   if (groupIds !== undefined) {

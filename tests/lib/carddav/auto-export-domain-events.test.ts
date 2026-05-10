@@ -48,6 +48,9 @@ vi.mock('@/lib/prisma', () => ({
       update: mocks.updateMapping,
       create: vi.fn(async () => ({})),
     },
+    user: {
+      findUnique: vi.fn(async () => ({ nameOrder: 'WESTERN' })),
+    },
   },
 }));
 
