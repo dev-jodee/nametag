@@ -149,22 +149,47 @@ export default function SyncSettingsModal({
 
           {/* CardDAV Name Format */}
           <div>
-            <label htmlFor="cardDavNameFormat" className="block text-sm font-medium text-foreground mb-2">
+            <span className="block text-sm font-medium text-foreground mb-2">
               {t('cardDavNameFormatLabel')}
-            </label>
-            <select
-              id="cardDavNameFormat"
-              value={cardDavNameFormat}
-              onChange={(e) => setCardDavNameFormat(e.target.value)}
-              className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="FULL">{t('cardDavNameFormatFull')}</option>
-              <option value="NICKNAME_PREFERRED">{t('cardDavNameFormatNickname')}</option>
-              <option value="SHORT">{t('cardDavNameFormatShort')}</option>
-            </select>
-            <p className="mt-1 text-xs text-muted">
+            </span>
+            <div className="space-y-2">
+              {(['FULL', 'NICKNAME_PREFERRED', 'SHORT'] as const).map((value) => (
+                <label
+                  key={value}
+                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    cardDavNameFormat === value
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-muted'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="cardDavNameFormat"
+                    value={value}
+                    checked={cardDavNameFormat === value}
+                    onChange={(e) => setCardDavNameFormat(e.target.value)}
+                    className="mt-0.5 text-primary focus:ring-primary"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-foreground">
+                      {t(`cardDavNameFormat_${value}`)}
+                    </span>
+                    <p className="text-xs text-muted mt-0.5">
+                      {t(`cardDavNameFormatDesc_${value}`)}
+                    </p>
+                  </div>
+                </label>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted">
               {t('cardDavNameFormatHelp')}
             </p>
+            <div className="mt-2 px-3 py-2 rounded-md bg-surface-elevated text-xs text-muted">
+              {t('cardDavNameFormatExample')}{' '}
+              <span className="font-medium text-foreground">
+                {t(`cardDavNameFormatExampleValue_${cardDavNameFormat}`)}
+              </span>
+            </div>
           </div>
 
           {/* Error message */}
