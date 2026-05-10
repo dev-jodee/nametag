@@ -29,6 +29,7 @@ const mocks = vi.hoisted(() => ({
   cardDavConflictCreate: vi.fn(),
   personFindMany: vi.fn(),
   personUpdate: vi.fn(),
+  userFindUnique: vi.fn(),
   personPhoneDeleteMany: vi.fn(),
   personEmailDeleteMany: vi.fn(),
   personAddressDeleteMany: vi.fn(),
@@ -81,6 +82,9 @@ vi.mock('@/lib/prisma', () => ({
     person: {
       findMany: mocks.personFindMany,
       update: mocks.personUpdate,
+    },
+    user: {
+      findUnique: mocks.userFindUnique,
     },
     personPhone: { deleteMany: mocks.personPhoneDeleteMany },
     personEmail: { deleteMany: mocks.personEmailDeleteMany },
@@ -271,6 +275,9 @@ describe('CardDAV Sync Engine', () => {
     mocks.cardDavConnectionFindUnique.mockResolvedValue(makeConnection());
     mocks.cardDavConnectionUpdate.mockResolvedValue({});
     mocks.cardDavConnectionUpdateMany.mockResolvedValue({ count: 1 });
+
+    // Default: user exists with WESTERN name order
+    mocks.userFindUnique.mockResolvedValue({ nameOrder: 'WESTERN' });
 
     // Default: one address book
     mocks.fetchAddressBooks.mockResolvedValue([makeAddressBook()]);

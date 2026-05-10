@@ -466,6 +466,11 @@ export async function syncToServer(
       throw new Error('CardDAV connection not found');
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { nameOrder: true },
+    });
+
     onProgress?.({ phase: 'push', step: 'connecting' });
 
     // Create CardDAV client
@@ -556,6 +561,8 @@ export async function syncToServer(
         const vCardData = personToVCard(personWithAllRelations, {
           photoDataUri,
           preservedProperties: preservedProps || undefined,
+          cardDavNameFormat: connection.cardDavNameFormat,
+          nameOrder: user?.nameOrder,
         });
 
         if (mapping.href) {
@@ -764,7 +771,11 @@ export async function syncToServer(
           if (loaded) unmappedPhotoDataUri = loaded;
         }
 
-        const vCardData = personToVCard(person, { photoDataUri: unmappedPhotoDataUri });
+        const vCardData = personToVCard(person, {
+          photoDataUri: unmappedPhotoDataUri,
+          cardDavNameFormat: connection.cardDavNameFormat,
+          nameOrder: user?.nameOrder,
+        });
         const filename = `${uid}.vcf`;
 
         // Create vCard on server. On 412, the vCard already exists (e.g., same UID

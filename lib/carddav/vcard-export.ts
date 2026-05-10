@@ -18,6 +18,7 @@ import {
   buildCustomFieldXLines,
   filterFreeFormCustomFieldsAgainstTemplates,
 } from '@/lib/customFields/serialize';
+import { formatGraphName } from '@/lib/nameUtils';
 
 export interface VCardOptions {
   includePhoto?: boolean; // Default: true (requires base64 encoding)
@@ -25,6 +26,8 @@ export interface VCardOptions {
   stripMarkdown?: boolean; // Default: false
   photoDataUri?: string; // Pre-loaded photo data URI for file-based photos
   preservedProperties?: UnknownProperty[]; // Round-trip unknown vCard properties
+  cardDavNameFormat?: 'FULL' | 'NICKNAME_PREFERRED' | 'SHORT';
+  nameOrder?: 'WESTERN' | 'EASTERN';
 }
 
 const DEFAULT_OPTIONS: VCardOptions = {
@@ -63,8 +66,16 @@ export function personToVCard(
   }
 
   // FN (Formatted Name) - required
-  const fullName = formatFullName(person);
-  lines.push(buildV3Property('FN', {}, fullName));
+  // Per-contact override takes priority, then user's CardDAV name format, then full name
+  let formattedName: string;
+  if (person.cardDavDisplayName) {
+    formattedName = person.cardDavDisplayName;
+  } else if (opts.cardDavNameFormat && opts.cardDavNameFormat !== 'FULL') {
+    formattedName = formatGraphName(person, opts.nameOrder, opts.cardDavNameFormat);
+  } else {
+    formattedName = formatFullName(person);
+  }
+  lines.push(buildV3Property('FN', {}, formattedName));
 
   // N (Structured Name) - surname;given;middle;prefix;suffix
   // RFC 2426: Family name field should include all surnames

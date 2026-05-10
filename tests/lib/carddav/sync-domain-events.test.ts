@@ -73,6 +73,9 @@ vi.mock('@/lib/prisma', () => ({
       findMany: mocks.findManyPerson,
       update: vi.fn(async () => ({})),
     },
+    user: {
+      findUnique: vi.fn(async () => ({ nameOrder: 'WESTERN' })),
+    },
   },
 }));
 

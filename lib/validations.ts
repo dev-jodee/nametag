@@ -219,6 +219,7 @@ export const createPersonSchema = z.object({
   contactReminderInterval: z.number().int().min(1).max(99).nullable().optional(),
   contactReminderIntervalUnit: reminderIntervalUnitSchema.nullable().optional(),
   cardDavSyncEnabled: z.boolean().optional(),
+  cardDavDisplayName: z.string().max(200).nullable().optional(),
 
   // Multi-value vCard fields
   phoneNumbers: z.array(phoneNumberSchema).optional(),

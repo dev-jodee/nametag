@@ -65,6 +65,7 @@ const mockPerson: PersonWithRelations = {
   contactReminderIntervalUnit: null,
   lastContactReminderSent: null,
   cardDavSyncEnabled: true,
+  cardDavDisplayName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   phoneNumbers: [],
