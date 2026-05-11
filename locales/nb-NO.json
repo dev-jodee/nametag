@@ -228,6 +228,7 @@
       "cardDavNameFormatExampleValue_FULL": "Maria Gonzalez",
       "cardDavNameFormatExampleValue_NICKNAME_PREFERRED": "Mamma Gonzalez",
       "cardDavNameFormatExampleValue_SHORT": "Mamma",
+      "cardDavNameFormatWarning": "Nar du bruker et egendefinert navneformat, vil navneendringer gjort pa telefonen din ikke synkroniseres tilbake til Nametag. Rediger navn i Nametag i stedet.",
       "syncNow": "Synkroniser nå",
       "syncing": "Synkroniserer...",
       "syncSuccess": "Synkronisering fullført: {imported} importert, {exported} eksportert, {updated} oppdatert",

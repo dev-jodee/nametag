@@ -157,6 +157,7 @@ function makeConnection(overrides: Record<string, unknown> = {}) {
     autoExportNew: true,
     autoSyncInterval: 300,
     importMode: 'manual',
+    cardDavNameFormat: 'FULL',
     syncToken: null,
     lastSyncAt: null,
     lastError: null,

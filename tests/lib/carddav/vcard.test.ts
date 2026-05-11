@@ -1068,58 +1068,58 @@ END:VCARD`;
     });
   });
 
-  describe('FN field with cardDavNameFormat', () => {
-    function buildPerson(overrides: Partial<PersonWithRelations> = {}): PersonWithRelations {
-      return {
-        id: 'test-1',
-        userId: 'user-1',
-        name: 'Maria',
-        surname: 'Gonzalez',
-        middleName: null,
-        secondLastName: null,
-        nickname: 'Mom',
-        prefix: null,
-        suffix: null,
-        uid: 'test-uid',
-        organization: null,
-        jobTitle: null,
-        photo: null,
-        gender: null,
-        anniversary: null,
-        lastContact: null,
-        notes: null,
-        relationshipToUserId: null,
-        contactReminderEnabled: false,
-        contactReminderInterval: null,
-        contactReminderIntervalUnit: null,
-        lastContactReminderSent: null,
-        cardDavSyncEnabled: true,
-        cardDavDisplayName: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        deletedAt: null,
-        phoneNumbers: [],
-        emails: [],
-        addresses: [],
-        urls: [],
-        imHandles: [],
-        locations: [],
-        customFields: [],
-        customFieldValues: [],
-        importantDates: [],
-        relationshipsFrom: [],
-        groups: [],
-        ...overrides,
-      };
-    }
+  function buildPerson(overrides: Partial<PersonWithRelations> = {}): PersonWithRelations {
+    return {
+      id: 'test-1',
+      userId: 'user-1',
+      name: 'Maria',
+      surname: 'Gonzalez',
+      middleName: null,
+      secondLastName: null,
+      nickname: 'Mom',
+      prefix: null,
+      suffix: null,
+      uid: 'test-uid',
+      organization: null,
+      jobTitle: null,
+      photo: null,
+      gender: null,
+      anniversary: null,
+      lastContact: null,
+      notes: null,
+      relationshipToUserId: null,
+      contactReminderEnabled: false,
+      contactReminderInterval: null,
+      contactReminderIntervalUnit: null,
+      lastContactReminderSent: null,
+      cardDavSyncEnabled: true,
+      cardDavDisplayName: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: null,
+      phoneNumbers: [],
+      emails: [],
+      addresses: [],
+      urls: [],
+      imHandles: [],
+      locations: [],
+      customFields: [],
+      customFieldValues: [],
+      importantDates: [],
+      relationshipsFrom: [],
+      groups: [],
+      ...overrides,
+    };
+  }
 
+  describe('FN field with cardDavNameFormat', () => {
     it('should use cardDavDisplayName override when set', () => {
       const person = buildPerson({ cardDavDisplayName: 'Mom' });
       const vcard = personToVCard(person, { cardDavNameFormat: 'FULL' });
 
       expect(vcard).toContain('FN:Mom');
-      // N field should still have the real structured name
-      expect(vcard).toContain('N:Gonzalez;Maria;;;');
+      // N field is rewritten to match display intent for iOS/Android
+      expect(vcard).toContain('N:;Mom;;;');
     });
 
     it('should use NICKNAME_PREFERRED format for FN', () => {
@@ -1172,6 +1172,88 @@ END:VCARD`;
       const vcard = personToVCard(person, { cardDavNameFormat: 'SHORT' });
 
       expect(vcard).toContain('FN:Maria');
+    });
+  });
+
+  describe('N field with cardDavNameFormat', () => {
+    it('should rewrite N with nickname for NICKNAME_PREFERRED', () => {
+      const person = buildPerson();
+      const vcard = personToVCard(person, { cardDavNameFormat: 'NICKNAME_PREFERRED' });
+      expect(vcard).toContain('N:Gonzalez;Mom;;;');
+    });
+
+    it('should clear family name in N for SHORT format', () => {
+      const person = buildPerson();
+      const vcard = personToVCard(person, { cardDavNameFormat: 'SHORT' });
+      expect(vcard).toContain('N:;Mom;;;');
+    });
+
+    it('should use full structured N for FULL format', () => {
+      const person = buildPerson({ middleName: 'Elena', prefix: 'Dr.', suffix: 'Jr.' });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FULL' });
+      expect(vcard).toContain('N:Gonzalez;Maria;Elena;Dr.;Jr.');
+    });
+
+    it('should put cardDavDisplayName in given-name component of N', () => {
+      const person = buildPerson({ cardDavDisplayName: 'Mom' });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FULL' });
+      expect(vcard).toContain('N:;Mom;;;');
+    });
+
+    it('should fall back to name when no nickname for NICKNAME_PREFERRED N', () => {
+      const person = buildPerson({ nickname: null });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'NICKNAME_PREFERRED' });
+      expect(vcard).toContain('N:Gonzalez;Maria;;;');
+    });
+
+    it('should fall back to name when no nickname for SHORT N', () => {
+      const person = buildPerson({ nickname: null });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'SHORT' });
+      expect(vcard).toContain('N:;Maria;;;');
+    });
+
+    it('should handle NICKNAME_PREFERRED with EASTERN name order in N', () => {
+      const person = buildPerson();
+      const vcard = personToVCard(person, { cardDavNameFormat: 'NICKNAME_PREFERRED', nameOrder: 'EASTERN' });
+      // N field order is always surname;given per vCard spec, regardless of display order
+      expect(vcard).toContain('N:Gonzalez;Mom;;;');
+    });
+
+    it('should emit X-NAMETAG-ORIGINAL-N for non-FULL formats', () => {
+      const person = buildPerson();
+      const vcard = personToVCard(person, { cardDavNameFormat: 'SHORT' });
+      expect(vcard).toContain('X-NAMETAG-ORIGINAL-N:Gonzalez;Maria;;;');
+    });
+
+    it('should emit X-NAMETAG-ORIGINAL-N for per-contact override', () => {
+      const person = buildPerson({ cardDavDisplayName: 'Mom' });
+      const vcard = personToVCard(person);
+      expect(vcard).toContain('X-NAMETAG-ORIGINAL-N:Gonzalez;Maria;;;');
+    });
+
+    it('should NOT emit X-NAMETAG-ORIGINAL-N for FULL format without override', () => {
+      const person = buildPerson();
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FULL' });
+      expect(vcard).not.toContain('X-NAMETAG-ORIGINAL-N');
+    });
+
+    it('should include secondLastName in family name for NICKNAME_PREFERRED', () => {
+      const person = buildPerson({ secondLastName: 'Lopez' });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'NICKNAME_PREFERRED' });
+      expect(vcard).toContain('N:Gonzalez Lopez;Mom;;;');
+    });
+
+    it('should not produce duplicate X-NAMETAG-ORIGINAL-N on round-trip', () => {
+      const person = buildPerson();
+      const vcard = personToVCard(person, { cardDavNameFormat: 'SHORT' });
+
+      // Verify it's emitted once
+      const matches = vcard.match(/X-NAMETAG-ORIGINAL-N/g);
+      expect(matches).toHaveLength(1);
+
+      // Parse the exported vCard and re-export - should still only have one
+      const parsed = vCardToPerson(vcard);
+      expect(parsed.customFields.find(f => f.key === 'X-NAMETAG-ORIGINAL-N')).toBeUndefined();
     });
   });
 });

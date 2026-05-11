@@ -228,6 +228,7 @@
       "cardDavNameFormatExampleValue_FULL": "王小明",
       "cardDavNameFormatExampleValue_NICKNAME_PREFERRED": "小明 王",
       "cardDavNameFormatExampleValue_SHORT": "小明",
+      "cardDavNameFormatWarning": "使用自定义名称格式时，在手机上所做的名称更改不会同步回Nametag。请在Nametag中编辑名称。",
       "syncNow": "立即同步",
       "syncing": "同步中...",
       "syncSuccess": "同步完成：{imported} 已导入，{exported} 已导出，{updated} 已更新",

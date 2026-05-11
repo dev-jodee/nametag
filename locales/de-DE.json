@@ -228,6 +228,7 @@
       "cardDavNameFormatExampleValue_FULL": "Maria Gonzalez",
       "cardDavNameFormatExampleValue_NICKNAME_PREFERRED": "Mama Gonzalez",
       "cardDavNameFormatExampleValue_SHORT": "Mama",
+      "cardDavNameFormatWarning": "Bei einem benutzerdefinierten Namensformat werden Namensaenderungen auf deinem Telefon nicht mit Nametag synchronisiert. Bearbeite Namen stattdessen in Nametag.",
       "syncNow": "Jetzt synchronisieren",
       "syncing": "Wird synchronisiert...",
       "syncSuccess": "Synchronisation abgeschlossen: {imported} importiert, {exported} exportiert, {updated} aktualisiert",
