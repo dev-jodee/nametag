@@ -343,9 +343,9 @@ export async function syncFromServer(
               // Non-FULL formats clear middleName, prefix, and suffix in the
               // exported N field. We must check all skipped components so that
               // stale values in those fields also trigger a corrective re-export.
-              let expectedMiddle = '';
-              let expectedPrefix = '';
-              let expectedSuffix = '';
+              const expectedMiddle = '';
+              const expectedPrefix = '';
+              const expectedSuffix = '';
 
               if (person.cardDavDisplayName) {
                 expectedGiven = person.cardDavDisplayName;
