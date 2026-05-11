@@ -312,8 +312,19 @@ export async function syncFromServer(
             result.conflicts++;
             continue;
           } else if (remoteChanged) {
-            // Only remote changed - update local
-            await updatePersonFromVCard(fullMapping.personId, parsedData, userId);
+            // When a non-FULL name format is active, the N field in the exported
+            // vCard contains the display name rather than the real name. Skip
+            // importing name fields to prevent overwriting real names in the DB.
+            const skipNameFields =
+              connection.cardDavNameFormat !== 'FULL'
+              || !!fullMapping.person.cardDavDisplayName;
+
+            await updatePersonFromVCard(
+              fullMapping.personId,
+              parsedData,
+              userId,
+              { skipNameFields },
+            );
 
             // Parse enhanced data only when needed (avoids double-parsing every vCard)
             const parsedEnhanced = parseVCard(vCard.data);
