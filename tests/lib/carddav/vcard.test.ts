@@ -1242,5 +1242,18 @@ END:VCARD`;
       const vcard = personToVCard(person, { cardDavNameFormat: 'NICKNAME_PREFERRED' });
       expect(vcard).toContain('N:Gonzalez Lopez;Mom;;;');
     });
+
+    it('should not produce duplicate X-NAMETAG-ORIGINAL-N on round-trip', () => {
+      const person = buildPerson();
+      const vcard = personToVCard(person, { cardDavNameFormat: 'SHORT' });
+
+      // Verify it's emitted once
+      const matches = vcard.match(/X-NAMETAG-ORIGINAL-N/g);
+      expect(matches).toHaveLength(1);
+
+      // Parse the exported vCard and re-export - should still only have one
+      const parsed = vCardToPerson(vcard);
+      expect(parsed.customFields.find(f => f.key === 'X-NAMETAG-ORIGINAL-N')).toBeUndefined();
+    });
   });
 });

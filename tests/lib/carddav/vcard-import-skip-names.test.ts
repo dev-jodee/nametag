@@ -72,4 +72,25 @@ describe('buildScalarPersonData with skipNameFields', () => {
     expect(result.jobTitle).toBe('CEO');
     expect(result.notes).toBe('Some notes');
   });
+
+  it('should skip all six name components when skipNameFields is true', () => {
+    const data = buildParsedData({
+      name: 'Mom',
+      surname: 'Gonzalez',
+      middleName: 'Elena',
+      secondLastName: 'Lopez',
+      prefix: 'Dr.',
+      suffix: 'Jr.',
+    });
+    const result = buildScalarPersonData(data, true);
+
+    expect(result.name).toBeUndefined();
+    expect(result.surname).toBeUndefined();
+    expect(result.middleName).toBeUndefined();
+    expect(result.secondLastName).toBeUndefined();
+    expect(result.prefix).toBeUndefined();
+    expect(result.suffix).toBeUndefined();
+    // Non-name fields still present
+    expect(result.nickname).toBe('Mom');
+  });
 });
