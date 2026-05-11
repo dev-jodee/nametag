@@ -335,7 +335,7 @@ export async function syncFromServer(
             // mapping as pending so the next push overwrites it with the
             // Nametag-derived name. If the name matches our export (e.g., Apple
             // just re-serialized without changes), mark as synced normally.
-            let syncStatusAfterImport: string = 'synced';
+            let syncStatusAfterImport: 'synced' | 'pending' = 'synced';
             if (skipNameFields) {
               const person = fullMapping.person;
               let expectedGiven: string;
