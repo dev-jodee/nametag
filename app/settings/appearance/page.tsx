@@ -59,9 +59,6 @@ export default async function AppearanceSettingsPage() {
         <h2 className="text-xl font-bold text-foreground mb-4">
           {t('dateFormatTitle')}
         </h2>
-        <p className="text-muted mb-6">
-          {t('dateFormatDescription')}
-        </p>
         <DateFormatSelector userId={session.user.id} currentFormat={currentDateFormat} />
       </div>
 
