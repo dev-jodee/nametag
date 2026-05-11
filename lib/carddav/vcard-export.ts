@@ -78,22 +78,55 @@ export function personToVCard(
   lines.push(buildV3Property('FN', {}, formattedName));
 
   // N (Structured Name) - surname;given;middle;prefix;suffix
-  // RFC 2426: Family name field should include all surnames
-  // For Spanish naming: combine surname + secondLastName with space
-  const familyName = [person.surname, person.secondLastName]
-    .filter(Boolean)
-    .join(' ');
+  //
+  // iOS and Android ignore FN and derive the display name from N components.
+  // To control how names appear on phones, we rewrite N to match the display
+  // intent when a non-FULL format or per-contact override is active.
+  // The real name data is always preserved in Nametag's database.
+  const isCustomFormat = (opts.cardDavNameFormat && opts.cardDavNameFormat !== 'FULL')
+    || !!person.cardDavDisplayName;
 
-  const structuredName = [
-    familyName || '',
-    person.name || '',
-    person.middleName || '',
-    person.prefix || '',
-    person.suffix || '',
-  ]
+  let nFamilyName = '';
+  let nGivenName = '';
+  let nMiddleName = '';
+  let nPrefix = '';
+  let nSuffix = '';
+
+  if (person.cardDavDisplayName) {
+    nGivenName = person.cardDavDisplayName;
+  } else if (opts.cardDavNameFormat === 'NICKNAME_PREFERRED') {
+    nGivenName = person.nickname || person.name || '';
+    nFamilyName = [person.surname, person.secondLastName].filter(Boolean).join(' ');
+  } else if (opts.cardDavNameFormat === 'SHORT') {
+    nGivenName = person.nickname || person.name || '';
+  } else {
+    // FULL: use real structured name (existing behavior)
+    nFamilyName = [person.surname, person.secondLastName].filter(Boolean).join(' ');
+    nGivenName = person.name || '';
+    nMiddleName = person.middleName || '';
+    nPrefix = person.prefix || '';
+    nSuffix = person.suffix || '';
+  }
+
+  const structuredName = [nFamilyName, nGivenName, nMiddleName, nPrefix, nSuffix]
     .map(escapeVCardText)
     .join(';');
   lines.push(`N:${structuredName}`);
+
+  // Emit the real structured name as best-effort metadata when N is rewritten.
+  // Apple may strip this on re-serialization, so we do not rely on it for safety.
+  // Nametag's database is the canonical source of truth.
+  if (isCustomFormat) {
+    const realFamilyName = [person.surname, person.secondLastName].filter(Boolean).join(' ');
+    const originalN = [
+      realFamilyName,
+      person.name || '',
+      person.middleName || '',
+      person.prefix || '',
+      person.suffix || '',
+    ].map(escapeVCardText).join(';');
+    lines.push(`X-NAMETAG-ORIGINAL-N:${originalN}`);
+  }
 
   // NICKNAME
   if (person.nickname) {

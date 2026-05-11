@@ -712,6 +712,23 @@ END:VCARD`;
       expect(parsed.unknownProperties.find(p => p.key === 'PRODID')).toBeUndefined();
       expect(parsed.customFields.find(f => f.key === 'ROLE')?.value).toBe('Tech Lead');
     });
+
+    it('should discard X-NAMETAG-ORIGINAL-N and not store it as custom field', () => {
+      const vcard = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        'FN:Mom',
+        'N:;Mom;;;',
+        'X-NAMETAG-ORIGINAL-N:Gonzalez;Maria;;;',
+        'END:VCARD',
+      ].join('\r\n');
+
+      const result = parseVCard(vcard);
+      const originalNField = result.customFields.find(
+        (f) => f.key === 'X-NAMETAG-ORIGINAL-N'
+      );
+      expect(originalNField).toBeUndefined();
+    });
   });
 
   describe('parseVCard - Unknown Properties', () => {

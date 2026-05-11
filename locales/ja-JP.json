@@ -227,6 +227,7 @@
       "cardDavNameFormatExampleValue_FULL": "田中 太郎",
       "cardDavNameFormatExampleValue_NICKNAME_PREFERRED": "たろちゃん 田中",
       "cardDavNameFormatExampleValue_SHORT": "たろちゃん",
+      "cardDavNameFormatWarning": "カスタム名前形式を使用している場合、電話で行った名前の変更はNametagに同期されません。名前はNametagで編集してください。",
       "syncNow": "今すぐ同期",
       "syncing": "同期中...",
       "syncSuccess": "同期完了：{imported}件インポート、{exported}件エクスポート、{updated}件更新",

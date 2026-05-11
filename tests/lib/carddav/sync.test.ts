@@ -167,7 +167,7 @@ import type { AddressBook } from '@/lib/carddav/client';
 const CONNECTION_ID = 'conn-1';
 const USER_ID = 'user-1';
 
-function makeConnection() {
+function makeConnection(overrides: Record<string, unknown> = {}) {
   return {
     id: CONNECTION_ID,
     userId: USER_ID,
@@ -178,12 +178,14 @@ function makeConnection() {
     autoExportNew: false,
     autoSyncInterval: 300,
     importMode: 'manual',
+    cardDavNameFormat: 'FULL',
     syncToken: null,
     lastSyncAt: null,
     lastError: null,
     lastErrorAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    ...overrides,
   };
 }
 
