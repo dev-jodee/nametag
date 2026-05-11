@@ -304,6 +304,7 @@ export async function updatePersonFromVCardInTransaction(
   tx: TxClient,
   personId: string,
   parsedData: ParsedVCardData,
+  options?: { skipNameFields?: boolean },
 ): Promise<void> {
   // Delete all multi-value fields
   await tx.personPhone.deleteMany({ where: { personId } });
@@ -319,7 +320,7 @@ export async function updatePersonFromVCardInTransaction(
   await tx.person.update({
     where: { id: personId },
     data: {
-      ...buildScalarPersonData(parsedData),
+      ...buildScalarPersonData(parsedData, options?.skipNameFields),
       uid: parsedData.uid,
 
       phoneNumbers: parsedData.phoneNumbers

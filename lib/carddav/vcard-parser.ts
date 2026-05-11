@@ -588,6 +588,14 @@ function processProperty(
           return true;
         }
 
+        // X-NAMETAG-ORIGINAL-N is best-effort metadata emitted when the N field
+        // is rewritten for non-FULL name formats. It is not imported as data;
+        // the canonical names live in Nametag's database. Silently discard it
+        // to avoid storing it as a custom field and re-exporting it as a duplicate.
+        if (prop.property === 'X-NAMETAG-ORIGINAL-N') {
+          return true;
+        }
+
         if (prop.property.startsWith('X-NAMETAG-')) {
           data.customFields.push({ key: prop.property, value: prop.value });
           return true;

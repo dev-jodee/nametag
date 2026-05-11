@@ -340,6 +340,12 @@ export async function syncFromServer(
               const person = fullMapping.person;
               let expectedGiven: string;
               let expectedFamily: string;
+              // Non-FULL formats clear middleName, prefix, and suffix in the
+              // exported N field. We must check all skipped components so that
+              // stale values in those fields also trigger a corrective re-export.
+              let expectedMiddle = '';
+              let expectedPrefix = '';
+              let expectedSuffix = '';
 
               if (person.cardDavDisplayName) {
                 expectedGiven = person.cardDavDisplayName;
@@ -355,9 +361,16 @@ export async function syncFromServer(
 
               const remoteGiven = parsedData.name || '';
               const remoteSurname = parsedData.surname || '';
+              const remoteMiddle = parsedData.middleName || '';
+              const remotePrefix = parsedData.prefix || '';
+              const remoteSuffix = parsedData.suffix || '';
 
               const nameDrifted =
-                remoteGiven !== expectedGiven || remoteSurname !== expectedFamily;
+                remoteGiven !== expectedGiven
+                || remoteSurname !== expectedFamily
+                || remoteMiddle !== expectedMiddle
+                || remotePrefix !== expectedPrefix
+                || remoteSuffix !== expectedSuffix;
 
               if (nameDrifted) {
                 syncStatusAfterImport = 'pending';
