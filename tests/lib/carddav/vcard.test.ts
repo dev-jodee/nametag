@@ -1173,6 +1173,18 @@ END:VCARD`;
 
       expect(vcard).toContain('FN:Maria');
     });
+
+    it('should use FIRST_LAST format for FN', () => {
+      const person = buildPerson({ middleName: 'Elena', secondLastName: 'Lopez' });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FIRST_LAST' });
+      expect(vcard).toContain('FN:Maria Gonzalez');
+    });
+
+    it('should use FIRST_LAST format with EASTERN name order for FN', () => {
+      const person = buildPerson();
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FIRST_LAST', nameOrder: 'EASTERN' });
+      expect(vcard).toContain('FN:Gonzalez Maria');
+    });
   });
 
   describe('N field with cardDavNameFormat', () => {
@@ -1237,10 +1249,22 @@ END:VCARD`;
       expect(vcard).not.toContain('X-NAMETAG-ORIGINAL-N');
     });
 
-    it('should include secondLastName in family name for NICKNAME_PREFERRED', () => {
+    it('should not include secondLastName in N for NICKNAME_PREFERRED', () => {
       const person = buildPerson({ secondLastName: 'Lopez' });
       const vcard = personToVCard(person, { cardDavNameFormat: 'NICKNAME_PREFERRED' });
-      expect(vcard).toContain('N:Gonzalez Lopez;Mom;;;');
+      expect(vcard).toContain('N:Gonzalez;Mom;;;');
+    });
+
+    it('should use first name and surname only for FIRST_LAST N', () => {
+      const person = buildPerson({ middleName: 'Elena', secondLastName: 'Lopez', prefix: 'Dr.', suffix: 'Jr.' });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FIRST_LAST' });
+      expect(vcard).toContain('N:Gonzalez;Maria;;;');
+    });
+
+    it('should emit X-NAMETAG-ORIGINAL-N for FIRST_LAST format', () => {
+      const person = buildPerson({ middleName: 'Elena', secondLastName: 'Lopez' });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FIRST_LAST' });
+      expect(vcard).toContain('X-NAMETAG-ORIGINAL-N:Gonzalez Lopez;Maria;Elena;;');
     });
 
     it('should not produce duplicate X-NAMETAG-ORIGINAL-N on round-trip', () => {
