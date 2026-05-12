@@ -7,7 +7,7 @@ const log = createModuleLogger('locale');
 /**
  * Supported locales
  */
-export const SUPPORTED_LOCALES = ['en', 'es-ES', 'ja-JP', 'nb-NO', 'de-DE', 'zh-CN', 'nl-NL'] as const;
+export const SUPPORTED_LOCALES = ['en', 'es-ES', 'ja-JP', 'nb-NO', 'de-DE', 'zh-CN', 'ru-RU', 'nl-NL'] as const;
 export type SupportedLocale = typeof SUPPORTED_LOCALES[number];
 
 /**
@@ -61,6 +61,10 @@ export function normalizeLocale(locale: string): SupportedLocale {
 
   if (languageCode === 'zh') {
     return 'zh-CN';
+  }
+
+  if (languageCode === 'ru') {
+    return 'ru-RU';
   }
 
   if (languageCode === 'nl') {
@@ -171,6 +175,9 @@ export async function detectBrowserLocale(): Promise<SupportedLocale> {
       }
       if (languageCode === 'de') {
         return 'de-DE';
+      }
+      if (languageCode === 'ru') {
+        return 'ru-RU';
       }
       if (languageCode === 'nl') {
         return 'nl-NL';

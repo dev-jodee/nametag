@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import 'flag-icons/css/flag-icons.min.css';
 
 interface LanguageSelectorProps {
-  currentLanguage: 'en' | 'es-ES' | 'ja-JP' | 'nb-NO' | 'de-DE' | 'zh-CN' | 'nl-NL';
+  currentLanguage: 'en' | 'es-ES' | 'ja-JP' | 'nb-NO' | 'de-DE' | 'zh-CN' | 'ru-RU' | 'nl-NL';
 }
 
 const LANGUAGES = [
@@ -16,6 +16,7 @@ const LANGUAGES = [
   { code: 'nb-NO' as const, name: 'Norsk bokmål', flag: 'no' },
   { code: 'de-DE' as const, name: 'Deutsch (German)', flag: 'de' },
   { code: 'zh-CN' as const, name: '简体中文', flag: 'cn' },
+  { code: 'ru-RU' as const, name: 'Русский', flag: 'ru' },
   { code: 'nl-NL' as const, name: 'Nederlands (Dutch)', flag: 'nl' },
 ];
 
@@ -26,6 +27,7 @@ const labelMap = {
   'nb-NO': 'nbNO',
   'de-DE': 'deDE',
   'zh-CN': 'zhCN',
+  'ru-RU': 'ruRU',
   'nl-NL': 'nlNL',
 } as const;
 
@@ -40,7 +42,7 @@ export default function LanguageSelector({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLanguageChange = async (
-    newLanguage: 'en' | 'es-ES' | 'ja-JP' | 'nb-NO' | 'de-DE' | 'zh-CN' | 'nl-NL',
+    newLanguage: 'en' | 'es-ES' | 'ja-JP' | 'nb-NO' | 'de-DE' | 'zh-CN' | 'ru-RU' | 'nl-NL',
   ) => {
     if (isLoading || newLanguage === selectedLanguage) return;
 
