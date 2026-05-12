@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.47.0](https://github.com/mattogodoy/nametag/compare/v0.46.0...v0.47.0) (2026-05-12)
+
+
+### Features
+
+* **add-nl:** add keys added in 0.46.0 ([71e21a6](https://github.com/mattogodoy/nametag/commit/71e21a63a42f7cd839e3e517f61caef2b27f4514))
+* **carddav:** add warning when non-FULL name format hides phone-side name edits ([981636c](https://github.com/mattogodoy/nametag/commit/981636cb8f30a96b08d24620732e13ed0f644c3a))
+* **carddav:** detect name drift and re-export when remote name differs ([80f5313](https://github.com/mattogodoy/nametag/commit/80f53138ef415255301a27c5437301a60784afc9))
+* **carddav:** rewrite N field alongside FN for iOS/Android compatibility ([018a783](https://github.com/mattogodoy/nametag/commit/018a783fd902c881f03b134a231f95921d6d3119))
+* **carddav:** skip name field imports for non-FULL formats ([8a48558](https://github.com/mattogodoy/nametag/commit/8a485586514f134d62a98b20d54a5e5feb82cbda))
+
+
+### Bug Fixes
+
+* add cardDavNameFormat to test mocks and narrow syncStatus type ([4d8a4b4](https://github.com/mattogodoy/nametag/commit/4d8a4b4b9d02e108ad204cf11f130023ef8aae1a))
+* **carddav:** close three gaps in name-format sync safety ([ad9e7bb](https://github.com/mattogodoy/nametag/commit/ad9e7bb2feadaa1b1835ab9abf5eb504cec89723))
+* **dateformatdescription:** formatting ([81f16c2](https://github.com/mattogodoy/nametag/commit/81f16c283aabebfb49583d6a70d6d6e97d901840))
+* **dateformatdescription:** formatting ([216a29d](https://github.com/mattogodoy/nametag/commit/216a29dc49703c585d52424697a7f99a25a84431))
+* remove duplicate date format setting desciption ([#267](https://github.com/mattogodoy/nametag/issues/267)) ([850f193](https://github.com/mattogodoy/nametag/commit/850f1937f8be79bc4576f8c94d6e451a94f78535))
+* remove duplicate dateFormatDescription ([5551ea5](https://github.com/mattogodoy/nametag/commit/5551ea540439a498148964dee42cabbe58077173))
+* use const for non-reassigned drift detection variables ([add1852](https://github.com/mattogodoy/nametag/commit/add18527cc87bff4cb1ebaf418f7182af3031d1a))
+
 ## [0.46.0](https://github.com/mattogodoy/nametag/compare/v0.45.0...v0.46.0) (2026-05-10)
 
 
