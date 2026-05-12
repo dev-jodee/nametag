@@ -153,7 +153,7 @@ export default function SyncSettingsModal({
               {t('cardDavNameFormatLabel')}
             </span>
             <div className="space-y-2">
-              {(['FULL', 'NICKNAME_PREFERRED', 'SHORT'] as const).map((value) => (
+              {(['FULL', 'FIRST_LAST', 'NICKNAME_PREFERRED', 'SHORT'] as const).map((value) => (
                 <label
                   key={value}
                   className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${

@@ -18,7 +18,7 @@ import {
   buildCustomFieldXLines,
   filterFreeFormCustomFieldsAgainstTemplates,
 } from '@/lib/customFields/serialize';
-import { formatGraphName } from '@/lib/nameUtils';
+import { formatGraphName, nameSeparator } from '@/lib/nameUtils';
 
 export interface VCardOptions {
   includePhoto?: boolean; // Default: true (requires base64 encoding)
@@ -26,7 +26,7 @@ export interface VCardOptions {
   stripMarkdown?: boolean; // Default: false
   photoDataUri?: string; // Pre-loaded photo data URI for file-based photos
   preservedProperties?: UnknownProperty[]; // Round-trip unknown vCard properties
-  cardDavNameFormat?: 'FULL' | 'NICKNAME_PREFERRED' | 'SHORT';
+  cardDavNameFormat?: 'FULL' | 'FIRST_LAST' | 'NICKNAME_PREFERRED' | 'SHORT';
   nameOrder?: 'WESTERN' | 'EASTERN';
 }
 
@@ -70,6 +70,17 @@ export function personToVCard(
   let formattedName: string;
   if (person.cardDavDisplayName) {
     formattedName = person.cardDavDisplayName;
+  } else if (opts.cardDavNameFormat === 'FIRST_LAST') {
+    const sep = nameSeparator(person.name, person.surname);
+    const parts: string[] = [];
+    if (opts.nameOrder === 'EASTERN') {
+      if (person.surname) parts.push(person.surname);
+      parts.push(person.name || '');
+    } else {
+      parts.push(person.name || '');
+      if (person.surname) parts.push(person.surname);
+    }
+    formattedName = parts.join(sep) || 'Unknown';
   } else if (opts.cardDavNameFormat && opts.cardDavNameFormat !== 'FULL') {
     formattedName = formatGraphName(person, opts.nameOrder, opts.cardDavNameFormat);
   } else {
@@ -94,9 +105,12 @@ export function personToVCard(
 
   if (person.cardDavDisplayName) {
     nGivenName = person.cardDavDisplayName;
+  } else if (opts.cardDavNameFormat === 'FIRST_LAST') {
+    nGivenName = person.name || '';
+    nFamilyName = person.surname || '';
   } else if (opts.cardDavNameFormat === 'NICKNAME_PREFERRED') {
     nGivenName = person.nickname || person.name || '';
-    nFamilyName = [person.surname, person.secondLastName].filter(Boolean).join(' ');
+    nFamilyName = person.surname || '';
   } else if (opts.cardDavNameFormat === 'SHORT') {
     nGivenName = person.nickname || person.name || '';
   } else {

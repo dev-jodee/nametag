@@ -322,6 +322,7 @@ enum NameDisplayFormat {
 
 enum CardDavNameFormat {
   FULL
+  FIRST_LAST
   NICKNAME_PREFERRED
   SHORT
 }

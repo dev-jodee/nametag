@@ -11,7 +11,7 @@ function isCJK(text: string): boolean {
  * Determines the separator for joining name parts.
  * Returns '' if all parts are CJK characters, ' ' otherwise.
  */
-function nameSeparator(...parts: (string | null | undefined)[]): string {
+export function nameSeparator(...parts: (string | null | undefined)[]): string {
   const nonEmpty = parts.filter((p): p is string => !!p);
   return nonEmpty.length > 0 && nonEmpty.every(isCJK) ? '' : ' ';
 }
