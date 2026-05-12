@@ -94,6 +94,11 @@ export async function autoExportPerson(personId: string): Promise<void> {
     return;
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: person.userId },
+    select: { nameOrder: true },
+  });
+
   // Check if already mapped
   const existingMapping = await prisma.cardDavMapping.findUnique({
     where: { personId: person.id },
@@ -130,7 +135,11 @@ export async function autoExportPerson(personId: string): Promise<void> {
     }
 
     // Convert to vCard
-    const vCardData = personToVCard(person, { photoDataUri });
+    const vCardData = personToVCard(person, {
+      photoDataUri,
+      cardDavNameFormat: connection.cardDavNameFormat,
+      nameOrder: user?.nameOrder,
+    });
 
     // Create vCard on server
     const filename = `${uid}.vcf`;
@@ -284,6 +293,11 @@ export async function autoUpdatePerson(personId: string): Promise<void> {
     return;
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: person.userId },
+    select: { nameOrder: true },
+  });
+
   // Get mapping
   const mapping = await prisma.cardDavMapping.findUnique({
     where: { personId: person.id },
@@ -325,7 +339,11 @@ export async function autoUpdatePerson(personId: string): Promise<void> {
     }
 
     // Convert to vCard
-    const vCardData = personToVCard(person, { photoDataUri: updatePhotoDataUri });
+    const vCardData = personToVCard(person, {
+      photoDataUri: updatePhotoDataUri,
+      cardDavNameFormat: connection.cardDavNameFormat,
+      nameOrder: user?.nameOrder,
+    });
 
     // Update vCard on server
     let vCard = {

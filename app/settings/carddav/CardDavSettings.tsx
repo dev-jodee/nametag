@@ -13,12 +13,14 @@ interface CardDavSettingsProps {
   connection: CardDavConnectionResponse | null;
   pendingImportsCount: number;
   syncedContactsCount: number;
+  pendingUploadsCount: number;
 }
 
 export default function CardDavSettings({
   connection,
   pendingImportsCount,
   syncedContactsCount,
+  pendingUploadsCount,
 }: CardDavSettingsProps) {
   const [showConnectionModal, setShowConnectionModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -44,6 +46,7 @@ export default function CardDavSettings({
         connection={connection}
         pendingImportsCount={pendingImportsCount}
         syncedContactsCount={syncedContactsCount}
+        pendingUploadsCount={pendingUploadsCount}
         onConnectClick={() => setShowConnectionModal(true)}
         onEditClick={() => setShowConnectionModal(true)}
         onSettingsClick={() => setShowSettingsModal(true)}

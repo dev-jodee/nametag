@@ -68,6 +68,7 @@ export function sharedSchemas(): Record<string, unknown> {
         },
         lastContactReminderSent: { type: ['string', 'null'], format: 'date-time' },
         cardDavSyncEnabled: { type: 'boolean' },
+        cardDavDisplayName: { type: ['string', 'null'], maxLength: 200, description: 'Per-contact display name override for CardDAV sync' },
         prefix: { type: ['string', 'null'], description: 'Honorific prefix (Dr., Mr.)' },
         suffix: { type: ['string', 'null'], description: 'Honorific suffix (Jr., III)' },
         uid: { type: ['string', 'null'], description: 'vCard UID for CardDAV sync' },

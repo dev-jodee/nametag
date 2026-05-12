@@ -20,6 +20,7 @@ const connectionSchema = z.object({
   importMode: z.enum(['manual', 'notify', 'auto']).optional(),
   addressBookUrl: z.string().url().optional(),
   addressBookName: z.string().optional(),
+  cardDavNameFormat: z.enum(['FULL', 'NICKNAME_PREFERRED', 'SHORT']).optional(),
 });
 
 const updateConnectionSchema = z.object({
@@ -31,6 +32,7 @@ const updateConnectionSchema = z.object({
   autoExportNew: z.boolean().optional(),
   autoSyncInterval: z.number().int().min(60).max(86400).optional(),
   importMode: z.enum(['manual', 'notify', 'auto']).optional(),
+  cardDavNameFormat: z.enum(['FULL', 'NICKNAME_PREFERRED', 'SHORT']).optional(),
 });
 
 export const POST = withLogging(async function POST(request: Request) {
@@ -62,6 +64,7 @@ export const POST = withLogging(async function POST(request: Request) {
       importMode,
       addressBookUrl,
       addressBookName,
+      cardDavNameFormat,
     } = validationResult.data;
 
     // Validate URL to prevent SSRF attacks
@@ -110,6 +113,7 @@ export const POST = withLogging(async function POST(request: Request) {
         importMode: importMode ?? 'manual', // Default: manual
         addressBookUrl: addressBookUrl || null,
         addressBookName: addressBookName || null,
+        cardDavNameFormat: cardDavNameFormat ?? 'FULL',
       },
     });
 
@@ -153,6 +157,7 @@ export const PUT = withLogging(async function PUT(request: Request) {
       autoExportNew,
       autoSyncInterval,
       importMode,
+      cardDavNameFormat,
     } = validationResult.data;
 
     // Validate URL to prevent SSRF attacks if serverUrl is being updated
@@ -189,6 +194,7 @@ export const PUT = withLogging(async function PUT(request: Request) {
       autoExportNew?: boolean;
       autoSyncInterval?: number;
       importMode?: string;
+      cardDavNameFormat?: 'FULL' | 'NICKNAME_PREFERRED' | 'SHORT';
     } = {};
 
     if (serverUrl !== undefined) {
@@ -215,12 +221,33 @@ export const PUT = withLogging(async function PUT(request: Request) {
     if (importMode !== undefined) {
       updateData.importMode = importMode;
     }
+    if (cardDavNameFormat !== undefined) {
+      updateData.cardDavNameFormat = cardDavNameFormat;
+    }
 
     // Update connection
     const connection = await prisma.cardDavConnection.update({
       where: { userId: session.user.id },
       data: updateData,
     });
+
+    // When the name format changes, mark all synced mappings as pending
+    // so the next sync re-exports them with the updated FN field.
+    if (
+      cardDavNameFormat !== undefined &&
+      cardDavNameFormat !== existingConnection.cardDavNameFormat
+    ) {
+      await prisma.cardDavMapping.updateMany({
+        where: {
+          connectionId: existingConnection.id,
+          syncStatus: 'synced',
+        },
+        data: {
+          syncStatus: 'pending',
+          lastLocalChange: new Date(),
+        },
+      });
+    }
 
     // Return connection without password
     const { password: _, ...safeConnection } = connection;

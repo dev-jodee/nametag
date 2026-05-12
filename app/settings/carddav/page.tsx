@@ -30,12 +30,22 @@ export default async function CardDavSettingsPage() {
       })
     : 0;
 
-  // Get synced contacts count
+  // Get synced contacts count (includes pending updates)
   const syncedContactsCount = connection
     ? await prisma.cardDavMapping.count({
         where: {
           connectionId: connection.id,
-          syncStatus: 'synced',
+          syncStatus: { in: ['synced', 'pending'] },
+        },
+      })
+    : 0;
+
+  // Get pending uploads count
+  const pendingUploadsCount = connection
+    ? await prisma.cardDavMapping.count({
+        where: {
+          connectionId: connection.id,
+          syncStatus: 'pending',
         },
       })
     : 0;
@@ -45,6 +55,7 @@ export default async function CardDavSettingsPage() {
       connection={connection}
       pendingImportsCount={pendingImportsCount}
       syncedContactsCount={syncedContactsCount}
+      pendingUploadsCount={pendingUploadsCount}
     />
   );
 }
