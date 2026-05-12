@@ -18,7 +18,7 @@ import {
   buildCustomFieldXLines,
   filterFreeFormCustomFieldsAgainstTemplates,
 } from '@/lib/customFields/serialize';
-import { formatGraphName } from '@/lib/nameUtils';
+import { formatGraphName, nameSeparator } from '@/lib/nameUtils';
 
 export interface VCardOptions {
   includePhoto?: boolean; // Default: true (requires base64 encoding)
@@ -71,6 +71,7 @@ export function personToVCard(
   if (person.cardDavDisplayName) {
     formattedName = person.cardDavDisplayName;
   } else if (opts.cardDavNameFormat === 'FIRST_LAST') {
+    const sep = nameSeparator(person.name, person.surname);
     const parts: string[] = [];
     if (opts.nameOrder === 'EASTERN') {
       if (person.surname) parts.push(person.surname);
@@ -79,7 +80,7 @@ export function personToVCard(
       parts.push(person.name || '');
       if (person.surname) parts.push(person.surname);
     }
-    formattedName = parts.join(' ') || 'Unknown';
+    formattedName = parts.join(sep) || 'Unknown';
   } else if (opts.cardDavNameFormat && opts.cardDavNameFormat !== 'FULL') {
     formattedName = formatGraphName(person, opts.nameOrder, opts.cardDavNameFormat);
   } else {

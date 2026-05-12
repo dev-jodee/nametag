@@ -1185,6 +1185,18 @@ END:VCARD`;
       const vcard = personToVCard(person, { cardDavNameFormat: 'FIRST_LAST', nameOrder: 'EASTERN' });
       expect(vcard).toContain('FN:Gonzalez Maria');
     });
+
+    it('should use FIRST_LAST with null surname for FN', () => {
+      const person = buildPerson({ surname: null });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FIRST_LAST' });
+      expect(vcard).toContain('FN:Maria');
+    });
+
+    it('should omit spaces for CJK names in FIRST_LAST FN', () => {
+      const person = buildPerson({ name: '太郎', surname: '田中', nickname: null });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FIRST_LAST' });
+      expect(vcard).toContain('FN:太郎田中');
+    });
   });
 
   describe('N field with cardDavNameFormat', () => {
@@ -1265,6 +1277,12 @@ END:VCARD`;
       const person = buildPerson({ middleName: 'Elena', secondLastName: 'Lopez' });
       const vcard = personToVCard(person, { cardDavNameFormat: 'FIRST_LAST' });
       expect(vcard).toContain('X-NAMETAG-ORIGINAL-N:Gonzalez Lopez;Maria;Elena;;');
+    });
+
+    it('should handle FIRST_LAST with null surname in N', () => {
+      const person = buildPerson({ surname: null });
+      const vcard = personToVCard(person, { cardDavNameFormat: 'FIRST_LAST' });
+      expect(vcard).toContain('N:;Maria;;;');
     });
 
     it('should not produce duplicate X-NAMETAG-ORIGINAL-N on round-trip', () => {
