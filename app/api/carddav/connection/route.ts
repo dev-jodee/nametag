@@ -20,7 +20,7 @@ const connectionSchema = z.object({
   importMode: z.enum(['manual', 'notify', 'auto']).optional(),
   addressBookUrl: z.string().url().optional(),
   addressBookName: z.string().optional(),
-  cardDavNameFormat: z.enum(['FULL', 'NICKNAME_PREFERRED', 'SHORT']).optional(),
+  cardDavNameFormat: z.enum(['FULL', 'FIRST_LAST', 'NICKNAME_PREFERRED', 'SHORT']).optional(),
 });
 
 const updateConnectionSchema = z.object({
@@ -32,7 +32,7 @@ const updateConnectionSchema = z.object({
   autoExportNew: z.boolean().optional(),
   autoSyncInterval: z.number().int().min(60).max(86400).optional(),
   importMode: z.enum(['manual', 'notify', 'auto']).optional(),
-  cardDavNameFormat: z.enum(['FULL', 'NICKNAME_PREFERRED', 'SHORT']).optional(),
+  cardDavNameFormat: z.enum(['FULL', 'FIRST_LAST', 'NICKNAME_PREFERRED', 'SHORT']).optional(),
 });
 
 export const POST = withLogging(async function POST(request: Request) {
@@ -194,7 +194,7 @@ export const PUT = withLogging(async function PUT(request: Request) {
       autoExportNew?: boolean;
       autoSyncInterval?: number;
       importMode?: string;
-      cardDavNameFormat?: 'FULL' | 'NICKNAME_PREFERRED' | 'SHORT';
+      cardDavNameFormat?: 'FULL' | 'FIRST_LAST' | 'NICKNAME_PREFERRED' | 'SHORT';
     } = {};
 
     if (serverUrl !== undefined) {

@@ -350,9 +350,12 @@ export async function syncFromServer(
               if (person.cardDavDisplayName) {
                 expectedGiven = person.cardDavDisplayName;
                 expectedFamily = '';
+              } else if (connection.cardDavNameFormat === 'FIRST_LAST') {
+                expectedGiven = person.name;
+                expectedFamily = person.surname || '';
               } else if (connection.cardDavNameFormat === 'NICKNAME_PREFERRED') {
                 expectedGiven = person.nickname || person.name;
-                expectedFamily = [person.surname, person.secondLastName].filter(Boolean).join(' ');
+                expectedFamily = person.surname || '';
               } else {
                 // SHORT
                 expectedGiven = person.nickname || person.name;
