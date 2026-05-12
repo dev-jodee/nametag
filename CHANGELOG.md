@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.47.1](https://github.com/mattogodoy/nametag/compare/v0.47.0...v0.47.1) (2026-05-12)
+
+
+### Bug Fixes
+
+* **carddav:** add FIRST_LAST format and drop secondLastName from non-FULL ([9547969](https://github.com/mattogodoy/nametag/commit/95479699e505905dfa0f5f2c9d5e7bb054b53143))
+* **carddav:** add FIRST_LAST to CardDavNameFormat enum ([35e12a5](https://github.com/mattogodoy/nametag/commit/35e12a5a10853cb8f2cd7fc1162f679dd7210141))
+* **carddav:** add FIRST_LAST to name format UI with updated labels and examples ([af95328](https://github.com/mattogodoy/nametag/commit/af95328f96e380bd531fad3d91fca64613b276c9))
+* **carddav:** add FIRST_LAST to validation, drift detection, and OpenAPI ([378c6d0](https://github.com/mattogodoy/nametag/commit/378c6d0cef911df9bd7afc943dec3ee6642dd809))
+* **carddav:** CJK-aware spacing for FIRST_LAST and add missing tests ([337d7d7](https://github.com/mattogodoy/nametag/commit/337d7d784d835c3e01430b55aa2c310c9c98be3a))
+
 ## [0.47.0](https://github.com/mattogodoy/nametag/compare/v0.46.0...v0.47.0) (2026-05-12)
 
 
