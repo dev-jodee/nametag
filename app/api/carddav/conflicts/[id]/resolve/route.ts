@@ -103,6 +103,13 @@ export const POST = withLogging(async function POST(request: Request, context: R
       // not raw vCard text, so use it directly.
       const remoteData = JSON.parse(conflict.remoteVersion) as ParsedVCardData;
 
+      // When a non-FULL name format is active, the N field contains the display
+      // name (e.g., "Mom") not the real name. Skip name fields even on
+      // keep_remote to preserve the canonical names in Nametag's database.
+      const skipNameFields =
+        conflict.mapping.connection.cardDavNameFormat !== 'FULL'
+        || !!conflict.mapping.person.cardDavDisplayName;
+
       // Wrap all operations in a single interactive transaction for atomicity
       await prisma.$transaction(async (tx) => {
         // Update person with remote data (delete multi-value fields + recreate)
@@ -110,6 +117,7 @@ export const POST = withLogging(async function POST(request: Request, context: R
           tx,
           conflict.mapping.personId,
           remoteData,
+          { skipNameFields },
         );
 
         await tx.cardDavConflict.update({

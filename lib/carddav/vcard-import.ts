@@ -111,18 +111,26 @@ function buildMultiValueUpdateData(parsedData: ParsedVCardData) {
 
 /**
  * Scalar person fields derived from parsed vCard data.
+ *
+ * When `skipNameFields` is true, name-related fields (name, surname,
+ * middleName, secondLastName, prefix, suffix) are returned as `undefined`
+ * so Prisma leaves the existing DB values intact. This is used during
+ * import when a non-FULL cardDavNameFormat or per-contact display-name
+ * override is active: the N field in the vCard contains the display name
+ * (e.g., "Mom") rather than the real name ("Maria"), so importing it
+ * would overwrite real names in the database.
  */
-function buildScalarPersonData(parsedData: ParsedVCardData) {
+export function buildScalarPersonData(parsedData: ParsedVCardData, skipNameFields = false) {
   // Use `?? null` for optional fields so Prisma clears them when absent from
   // the vCard.  Plain `undefined` would cause Prisma to skip the field entirely,
   // preserving a stale value after the remote side deleted it.
   return {
-    name: parsedData.name,
-    surname: parsedData.surname ?? null,
-    secondLastName: parsedData.secondLastName ?? null,
-    middleName: parsedData.middleName ?? null,
-    prefix: parsedData.prefix ?? null,
-    suffix: parsedData.suffix ?? null,
+    name: skipNameFields ? undefined : parsedData.name,
+    surname: skipNameFields ? undefined : (parsedData.surname ?? null),
+    secondLastName: skipNameFields ? undefined : (parsedData.secondLastName ?? null),
+    middleName: skipNameFields ? undefined : (parsedData.middleName ?? null),
+    prefix: skipNameFields ? undefined : (parsedData.prefix ?? null),
+    suffix: skipNameFields ? undefined : (parsedData.suffix ?? null),
     nickname: parsedData.nickname ?? null,
     organization: parsedData.organization ?? null,
     jobTitle: parsedData.jobTitle ?? null,
@@ -218,6 +226,7 @@ export async function updatePersonFromVCard(
   personId: string,
   parsedData: ParsedVCardData,
   userId: string,
+  options?: { skipNameFields?: boolean },
 ): Promise<void> {
   // Save photo as file if present (outside transaction since it's filesystem I/O)
   let photoValue = parsedData.photo;
@@ -244,7 +253,7 @@ export async function updatePersonFromVCard(
     await tx.person.update({
       where: { id: personId },
       data: {
-        ...buildScalarPersonData(parsedData),
+        ...buildScalarPersonData(parsedData, options?.skipNameFields),
         photo: photoValue ?? null,
         uid: parsedData.uid,
 
@@ -295,6 +304,7 @@ export async function updatePersonFromVCardInTransaction(
   tx: TxClient,
   personId: string,
   parsedData: ParsedVCardData,
+  options?: { skipNameFields?: boolean },
 ): Promise<void> {
   // Delete all multi-value fields
   await tx.personPhone.deleteMany({ where: { personId } });
@@ -310,7 +320,7 @@ export async function updatePersonFromVCardInTransaction(
   await tx.person.update({
     where: { id: personId },
     data: {
-      ...buildScalarPersonData(parsedData),
+      ...buildScalarPersonData(parsedData, options?.skipNameFields),
       uid: parsedData.uid,
 
       phoneNumbers: parsedData.phoneNumbers

@@ -134,7 +134,8 @@
         "nbNO": "Norsk bokmål (Norwegian Bokmål)",
         "deDE": "Deutsch",
         "zhCN": "简体中文",
-        "itIT": "Italiano (Italian)"
+        "itIT": "Italiano (Italian)",
+        "nlNL": "Nederlands (Dutch)"
       }
     },
     "security": {

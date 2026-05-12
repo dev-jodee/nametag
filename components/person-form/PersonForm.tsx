@@ -60,6 +60,7 @@ export interface PersonFormProps {
     contactReminderInterval?: number | null;
     contactReminderIntervalUnit?: ReminderIntervalUnit | null;
     cardDavSyncEnabled?: boolean;
+    cardDavDisplayName?: string | null;
     cardDavMapping?: { id: string } | null;
     importantDates?: Array<{
       id: string;

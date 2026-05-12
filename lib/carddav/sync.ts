@@ -312,11 +312,74 @@ export async function syncFromServer(
             result.conflicts++;
             continue;
           } else if (remoteChanged) {
-            // Only remote changed - update local
-            await updatePersonFromVCard(fullMapping.personId, parsedData, userId);
+            // When a non-FULL name format is active, the N field in the exported
+            // vCard contains the display name rather than the real name. Skip
+            // importing name fields to prevent overwriting real names in the DB.
+            const skipNameFields =
+              connection.cardDavNameFormat !== 'FULL'
+              || !!fullMapping.person.cardDavDisplayName;
+
+            await updatePersonFromVCard(
+              fullMapping.personId,
+              parsedData,
+              userId,
+              { skipNameFields },
+            );
 
             // Parse enhanced data only when needed (avoids double-parsing every vCard)
             const parsedEnhanced = parseVCard(vCard.data);
+
+            // Drift detection: when name fields are one-way (non-FULL format),
+            // check if the remote vCard's name differs from what Nametag would
+            // export. If someone renamed the contact on their phone, mark the
+            // mapping as pending so the next push overwrites it with the
+            // Nametag-derived name. If the name matches our export (e.g., Apple
+            // just re-serialized without changes), mark as synced normally.
+            let syncStatusAfterImport: 'synced' | 'pending' = 'synced';
+            if (skipNameFields) {
+              const person = fullMapping.person;
+              let expectedGiven: string;
+              let expectedFamily: string;
+              // Non-FULL formats clear middleName, prefix, and suffix in the
+              // exported N field. We must check all skipped components so that
+              // stale values in those fields also trigger a corrective re-export.
+              const expectedMiddle = '';
+              const expectedPrefix = '';
+              const expectedSuffix = '';
+
+              if (person.cardDavDisplayName) {
+                expectedGiven = person.cardDavDisplayName;
+                expectedFamily = '';
+              } else if (connection.cardDavNameFormat === 'NICKNAME_PREFERRED') {
+                expectedGiven = person.nickname || person.name;
+                expectedFamily = [person.surname, person.secondLastName].filter(Boolean).join(' ');
+              } else {
+                // SHORT
+                expectedGiven = person.nickname || person.name;
+                expectedFamily = '';
+              }
+
+              const remoteGiven = parsedData.name || '';
+              const remoteSurname = parsedData.surname || '';
+              const remoteMiddle = parsedData.middleName || '';
+              const remotePrefix = parsedData.prefix || '';
+              const remoteSuffix = parsedData.suffix || '';
+
+              const nameDrifted =
+                remoteGiven !== expectedGiven
+                || remoteSurname !== expectedFamily
+                || remoteMiddle !== expectedMiddle
+                || remotePrefix !== expectedPrefix
+                || remoteSuffix !== expectedSuffix;
+
+              if (nameDrifted) {
+                syncStatusAfterImport = 'pending';
+                log.info(
+                  { event: 'carddav.name_drift', personId: fullMapping.personId },
+                  'Remote name differs from expected export; marking pending for re-export',
+                );
+              }
+            }
 
             await prisma.cardDavMapping.update({
               where: { id: mapping.id },
@@ -326,7 +389,10 @@ export async function syncFromServer(
                 lastRemoteChange: new Date(),
                 lastSyncedAt: new Date(),
                 remoteVersion: remoteHash,
-                syncStatus: 'synced',
+                syncStatus: syncStatusAfterImport,
+                ...(syncStatusAfterImport === 'pending'
+                  ? { lastLocalChange: new Date() }
+                  : {}),
                 preservedProperties: parsedEnhanced.unknownProperties.length > 0
                   ? parsedEnhanced.unknownProperties
                   : undefined,
@@ -466,6 +532,11 @@ export async function syncToServer(
       throw new Error('CardDAV connection not found');
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { nameOrder: true },
+    });
+
     onProgress?.({ phase: 'push', step: 'connecting' });
 
     // Create CardDAV client
@@ -556,6 +627,8 @@ export async function syncToServer(
         const vCardData = personToVCard(personWithAllRelations, {
           photoDataUri,
           preservedProperties: preservedProps || undefined,
+          cardDavNameFormat: connection.cardDavNameFormat,
+          nameOrder: user?.nameOrder,
         });
 
         if (mapping.href) {
@@ -764,7 +837,11 @@ export async function syncToServer(
           if (loaded) unmappedPhotoDataUri = loaded;
         }
 
-        const vCardData = personToVCard(person, { photoDataUri: unmappedPhotoDataUri });
+        const vCardData = personToVCard(person, {
+          photoDataUri: unmappedPhotoDataUri,
+          cardDavNameFormat: connection.cardDavNameFormat,
+          nameOrder: user?.nameOrder,
+        });
         const filename = `${uid}.vcf`;
 
         // Create vCard on server. On 412, the vCard already exists (e.g., same UID

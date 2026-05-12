@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.46.0](https://github.com/mattogodoy/nametag/compare/v0.45.0...v0.46.0) (2026-05-10)
+
+
+### Features
+
+* **carddav:** accept cardDavNameFormat in connection API ([c2e5335](https://github.com/mattogodoy/nametag/commit/c2e5335689deabd7baf097f030e9ebf5890c0075))
+* **carddav:** add cardDavNameFormat and cardDavDisplayName schema fields ([8f749c0](https://github.com/mattogodoy/nametag/commit/8f749c08b43f7ce7c3940f468d97f7b3ac787f93))
+* **carddav:** add name format dropdown to sync settings modal ([b19d824](https://github.com/mattogodoy/nametag/commit/b19d8243c45b65fb39bde3f0a2fb3e95f9fc0b3f))
+* **carddav:** add per-contact cardDavDisplayName field to person form ([9419171](https://github.com/mattogodoy/nametag/commit/94191711f26bcae4eab4778716a464a325d17238))
+* **carddav:** add validation schemas for cardDavNameFormat and cardDavDisplayName ([b207a3f](https://github.com/mattogodoy/nametag/commit/b207a3ff81096700869d7ef244c5f6f2f4c80ac7))
+* **carddav:** apply cardDavNameFormat and cardDavDisplayName to vCard FN field ([ca73bdb](https://github.com/mattogodoy/nametag/commit/ca73bdbbf59d9409220654a9795abba07546d0ab))
+* **carddav:** improve name format selector with radio options and dynamic example ([9270f3a](https://github.com/mattogodoy/nametag/commit/9270f3af09b081e3ee154ad1b09e93582c3e63c3))
+* **carddav:** pass cardDavDisplayName through person service ([b608397](https://github.com/mattogodoy/nametag/commit/b608397176cfa02476fef662465d14adf495584c))
+* **carddav:** show pending uploads count on settings page ([e64f9fc](https://github.com/mattogodoy/nametag/commit/e64f9fc2c1e4fd1263f351fa6194d4b3acb17f47))
+* **carddav:** thread cardDavNameFormat through sync, auto-export, and bulk export ([1fabf51](https://github.com/mattogodoy/nametag/commit/1fabf515c303bc75c0ffd099b85005736cdc0aa6))
+* **i18n:** add translations for CardDAV name format settings ([1698c78](https://github.com/mattogodoy/nametag/commit/1698c78b9a7c4372df96ed7e15274eee7879c242))
+
+
+### Bug Fixes
+
+* address code review findings ([38c7b7f](https://github.com/mattogodoy/nametag/commit/38c7b7f6f469ef13bc703f0b88996243b0612fdf))
+* **carddav:** include pending mappings in synced contacts count ([5508fae](https://github.com/mattogodoy/nametag/commit/5508fae2cac6f4aa99c032d997b04210c4a35dad))
+* **carddav:** mark mappings as pending when name format changes ([2317b64](https://github.com/mattogodoy/nametag/commit/2317b64fb2587da9aee3e21609438766840a9b7c))
+
 ## [0.45.0](https://github.com/mattogodoy/nametag/compare/v0.44.7...v0.45.0) (2026-05-08)
 
 
