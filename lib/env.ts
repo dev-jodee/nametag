@@ -33,6 +33,11 @@ const envSchema = z.object({
   SMTP_REQUIRE_TLS: z.coerce.boolean().default(true).optional(),
   SMTP_FROM: z.string().optional(), // Override from address (e.g., for servers that reject custom from addresses)
 
+  // Telegram - Optional bot integration for reminders
+  TELEGRAM_BOT_TOKEN: z.string().min(1).optional(),
+  TELEGRAM_BOT_USERNAME: z.string().min(1).optional(),
+  TELEGRAM_WEBHOOK_SECRET: z.string().min(16, 'TELEGRAM_WEBHOOK_SECRET must be at least 16 characters').optional(),
+
   // Google OAuth - Only required in SaaS mode
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
@@ -168,6 +173,27 @@ export function validateEnv(): Env {
     console.error('  - EMAIL_DOMAIN is required when email is configured (Resend or SMTP)');
     console.error('\nPlease check your .env file.\n');
     throw new Error('Invalid environment configuration');
+  }
+
+  const telegramBotVars = [
+    result.data.TELEGRAM_BOT_TOKEN,
+    result.data.TELEGRAM_BOT_USERNAME,
+  ];
+  const hasAnyTelegramConfig =
+    telegramBotVars.some(v => v !== undefined) || result.data.TELEGRAM_WEBHOOK_SECRET !== undefined;
+
+  if (hasAnyTelegramConfig) {
+    const missingTelegramVars = [
+      !result.data.TELEGRAM_BOT_TOKEN && 'TELEGRAM_BOT_TOKEN',
+      !result.data.TELEGRAM_BOT_USERNAME && 'TELEGRAM_BOT_USERNAME',
+    ].filter(Boolean);
+
+    if (missingTelegramVars.length > 0) {
+      console.error('\n❌ Invalid environment variables:\n');
+      console.error(`  - Telegram configuration is incomplete. Missing: ${missingTelegramVars.join(', ')}`);
+      console.error('\nPlease check your .env file.\n');
+      throw new Error('Invalid environment configuration');
+    }
   }
 
   return result.data;

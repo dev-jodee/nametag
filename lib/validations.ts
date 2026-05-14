@@ -1,6 +1,15 @@
 import { z } from 'zod';
 import { PREDEFINED_DATE_TYPES } from './important-date-types';
 
+function isValidTimeZone(timeZone: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // ============================================
 // Common schemas
 // ============================================
@@ -25,6 +34,11 @@ export const hexColorSchema = z
   .nullable()
   .optional()
   .describe('Hex color, e.g. #FF5733');
+
+export const timeZoneSchema = z
+  .string()
+  .min(1, 'Time zone is required')
+  .refine(isValidTimeZone, 'Time zone must be a valid IANA time zone');
 
 // ============================================
 // Auth schemas
@@ -427,6 +441,12 @@ export const updateGraphDisplaySchema = z.object({
   graphMode: z.enum(['individuals', 'bubbles']),
 });
 
+export const updateNotificationsSchema = z.object({
+  telegramRemindersEnabled: z.boolean(),
+  telegramReminderHour: z.number().int().min(0).max(23),
+  timeZone: timeZoneSchema,
+});
+
 // ============================================
 // Import schema
 // ============================================
@@ -518,6 +538,20 @@ export const createImportantDateSchema = z.object({
 );
 
 export const updateImportantDateSchema = createImportantDateSchema;
+
+// ============================================
+// Event schemas
+// ============================================
+
+export const createEventSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200),
+  date: z.iso.datetime({ error: 'Invalid datetime' }),
+  personIds: z.array(z.string()).min(1, 'At least one person is required'),
+});
+
+export const updateEventSchema = createEventSchema.partial().extend({
+  personIds: z.array(z.string()).optional(),
+});
 
 // ============================================
 // Helper function for API validation

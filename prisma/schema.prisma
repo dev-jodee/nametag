@@ -23,6 +23,10 @@ model User {
   nameDisplayFormat  NameDisplayFormat @default(FULL)
   graphMode          String?           // 'individuals' | 'bubbles' | null (unset → individuals)
   language           String?   @default("en") // "en" or "es-ES"
+  timeZone           String    @default("UTC")
+  telegramRemindersEnabled Boolean @default(false)
+  telegramReminderHour Int      @default(9)
+  lastTelegramDigestSentAt DateTime?
   emailVerified      Boolean   @default(false)
   emailVerifyToken   String?   @unique
   emailVerifyExpires DateTime?
@@ -44,15 +48,19 @@ model User {
   updatedAt          DateTime  @updatedAt
 
   // Relations
-  people                Person[]
-  groups                Group[]
-  relationshipTypes     RelationshipType[]
-  subscription          Subscription?
-  unsubscribeTokens     UnsubscribeToken[]
-  cardDavConnection     CardDavConnection?
-  cardDavPendingImports CardDavPendingImport[]
-  customFieldTemplates  CustomFieldTemplate[]
-  duplicateDismissals   DuplicateDismissal[]
+  people                     Person[]
+  groups                     Group[]
+  relationshipTypes          RelationshipType[]
+  subscription               Subscription?
+  unsubscribeTokens          UnsubscribeToken[]
+  cardDavConnection          CardDavConnection?
+  cardDavPendingImports      CardDavPendingImport[]
+  customFieldTemplates       CustomFieldTemplate[]
+  duplicateDismissals        DuplicateDismissal[]
+  telegramConnection         TelegramConnection?
+  telegramLinkTokens         TelegramLinkToken[]
+  telegramReminderDeliveries TelegramReminderDelivery[]
+  events                     Event[]
 
   journalEntries        JournalEntry[]
 
@@ -117,6 +125,7 @@ model Person {
   dismissalsAsA      DuplicateDismissal[]   @relation("DismissalPersonA")
   dismissalsAsB      DuplicateDismissal[]   @relation("DismissalPersonB")
   journalEntries     JournalEntryPerson[]
+  events             Event[]                @relation("EventPeople")
 
   @@index([userId])
   @@index([relationshipToUserId])
@@ -130,6 +139,24 @@ model Person {
   @@index([userId, deletedAt]) // For soft delete filtering
   @@unique([userId, uid])
   @@map("people")
+}
+
+// Event Model - Planned events with linked contacts
+model Event {
+  id                   String   @id @default(cuid())
+  userId               String
+  title                String
+  date                 DateTime
+  lastContactProcessed Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  // Relations
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  people Person[] @relation("EventPeople")
+
+  @@index([userId, date])
+  @@map("events")
 }
 
 // Group Model - User-defined categories for organizing people
@@ -535,6 +562,74 @@ model UnsubscribeToken {
   @@index([entityId, reminderType])
   @@index([expiresAt])
   @@map("unsubscribe_tokens")
+}
+
+model TelegramConnection {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  telegramUserId    String
+  telegramChatId    String   @unique
+  telegramUsername  String?
+  telegramFirstName String?
+  isActive          Boolean  @default(true)
+  connectedAt       DateTime @default(now())
+  lastInteractionAt DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user               User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reminderDeliveries TelegramReminderDelivery[]
+
+  @@index([telegramUserId])
+  @@map("telegram_connections")
+}
+
+model TelegramLinkToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("telegram_link_tokens")
+}
+
+model TelegramReminderDelivery {
+  id                   String             @id @default(cuid())
+  userId               String
+  telegramConnectionId String
+  reminderType         ReminderEntityType
+  entityId             String
+  callbackToken        String             @unique
+  telegramMessageId    String?
+  status               String             @default("sent")
+  actionTaken          String?
+  actionTakenAt        DateTime?
+  sentAt               DateTime           @default(now())
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  telegramConnection TelegramConnection @relation(fields: [telegramConnectionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sentAt])
+  @@index([entityId, reminderType])
+  @@index([telegramConnectionId])
+  @@map("telegram_reminder_deliveries")
+}
+
+model TelegramBotState {
+  id           String   @id @default("default")
+  lastUpdateId Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("telegram_bot_state")
 }
 
 // ============================================

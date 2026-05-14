@@ -10,6 +10,13 @@ import { createUnsubscribeToken } from '@/lib/unsubscribe-tokens';
 import { parseAsLocalDate } from '@/lib/date-format';
 import { getTranslationsForLocale, type SupportedLocale } from '@/lib/i18n-utils';
 import { getDateDisplayTitle } from '@/lib/important-date-types';
+import {
+  getCurrentHourInTimeZone,
+  wasDateSentTodayInTimeZone,
+} from '@/lib/reminder-utils';
+import { buildTelegramDigestKeyboard, sendTelegramMessage } from '@/lib/telegram';
+import { generateToken } from '@/lib/token-hash';
+import { getPersonIdsWithFutureEvents } from '@/lib/services/event';
 
 const log = createModuleLogger('cron');
 
@@ -135,6 +142,8 @@ export const GET = withLogging(async function GET(request: Request) {
       }
     }
 
+    const personIdsWithFutureEvents = await getPersonIdsWithFutureEvents({ today });
+
     // Process contact reminders
     const peopleWithContactReminders = await prisma.person.findMany({
       where: {
@@ -149,6 +158,17 @@ export const GET = withLogging(async function GET(request: Request) {
             language: true,
             nameOrder: true,
             nameDisplayFormat: true,
+            timeZone: true,
+            telegramRemindersEnabled: true,
+            telegramReminderHour: true,
+            lastTelegramDigestSentAt: true,
+            telegramConnection: {
+              select: {
+                id: true,
+                telegramChatId: true,
+                isActive: true,
+              },
+            },
           },
         },
       },
@@ -156,7 +176,16 @@ export const GET = withLogging(async function GET(request: Request) {
 
     // Collect contact reminders
     for (const person of peopleWithContactReminders) {
-      const shouldSend = shouldSendContactReminder(person, today);
+      if (personIdsWithFutureEvents.has(person.id)) {
+        continue;
+      }
+
+      const hasActiveTelegram = Boolean(
+        person.user.telegramRemindersEnabled
+        && person.user.telegramConnection?.isActive
+      );
+
+      const shouldSend = !hasActiveTelegram && shouldSendContactReminder(person, today);
 
       if (shouldSend) {
         const userLanguage = (person.user.language as SupportedLocale) || 'en';
@@ -204,6 +233,9 @@ export const GET = withLogging(async function GET(request: Request) {
     // Send all reminders as a batch
     let sentCount = 0;
     let errorCount = 0;
+    let telegramSentCount = 0;
+    let telegramErrorCount = 0;
+    const usersWithTelegramSent = new Set<string>();
 
     if (pendingReminders.length > 0) {
       const batchResult = await sendEmailBatch(pendingReminders.map(r => r.email));
@@ -234,9 +266,127 @@ export const GET = withLogging(async function GET(request: Request) {
       }
     }
 
+    type DigestPerson = (typeof peopleWithContactReminders)[number];
+    type DigestUser = DigestPerson['user'];
+    type DigestConnection = NonNullable<DigestUser['telegramConnection']>;
+
+    const digestsByUser = new Map<string, {
+      user: DigestUser;
+      telegramConnection: DigestConnection;
+      persons: DigestPerson[];
+    }>();
+
+    for (const person of peopleWithContactReminders) {
+      if (personIdsWithFutureEvents.has(person.id)) {
+        continue;
+      }
+      if (!isContactOverdue(person, today)) {
+        continue;
+      }
+
+      const user = person.user;
+      const telegramConnection = user.telegramConnection;
+
+      if (
+        !user.telegramRemindersEnabled
+        || !telegramConnection?.isActive
+        || wasDateSentTodayInTimeZone(user.lastTelegramDigestSentAt, user.timeZone)
+        || getCurrentHourInTimeZone(user.timeZone) < user.telegramReminderHour
+      ) {
+        continue;
+      }
+
+      let bucket = digestsByUser.get(person.userId);
+      if (!bucket) {
+        bucket = { user, telegramConnection, persons: [] };
+        digestsByUser.set(person.userId, bucket);
+      }
+      bucket.persons.push(person);
+    }
+
+    for (const [userId, { user, telegramConnection, persons }] of digestsByUser) {
+      const userLanguage = (user.language as SupportedLocale) || 'en';
+
+      const entries = persons.map((person) => ({
+        person,
+        callbackToken: generateToken(16),
+        name: formatGraphName(person, user.nameOrder, user.nameDisplayFormat),
+        lastContactFormatted: person.lastContact
+          ? formatDateForEmail(person.lastContact, user.dateFormat, userLanguage)
+          : 'No contact date recorded',
+        intervalText: formatInterval(
+          person.contactReminderInterval || 1,
+          person.contactReminderIntervalUnit || 'MONTHS'
+        ),
+      }));
+
+      const headline = persons.length === 1
+        ? '1 overdue contact:'
+        : `${persons.length} overdue contacts:`;
+
+      const messageText = [
+        headline,
+        ...entries.map((entry) =>
+          `• ${entry.name} — last ${entry.lastContactFormatted} (every ${entry.intervalText})`
+        ),
+      ].join('\n');
+
+      const tokens = entries.map((entry) => entry.callbackToken);
+
+      await prisma.telegramReminderDelivery.createMany({
+        data: entries.map((entry) => ({
+          userId,
+          telegramConnectionId: telegramConnection.id,
+          reminderType: 'CONTACT',
+          entityId: entry.person.id,
+          callbackToken: entry.callbackToken,
+          status: 'pending',
+        })),
+      });
+
+      try {
+        const message = await sendTelegramMessage({
+          chatId: telegramConnection.telegramChatId,
+          text: messageText,
+          replyMarkup: buildTelegramDigestKeyboard(entries),
+        });
+
+        await prisma.telegramReminderDelivery.updateMany({
+          where: { callbackToken: { in: tokens } },
+          data: {
+            telegramMessageId: message.messageId,
+            status: 'sent',
+          },
+        });
+
+        usersWithTelegramSent.add(userId);
+        telegramSentCount += entries.length;
+      } catch (error) {
+        telegramErrorCount += entries.length;
+        await prisma.telegramReminderDelivery.updateMany({
+          where: { callbackToken: { in: tokens } },
+          data: { status: 'failed' },
+        });
+        log.error({
+          userId,
+          digestSize: entries.length,
+          errorMessage: error instanceof Error ? error.message : String(error),
+        }, 'Failed to send Telegram contact digest');
+      }
+    }
+
+    if (usersWithTelegramSent.size > 0) {
+      await prisma.user.updateMany({
+        where: { id: { in: Array.from(usersWithTelegramSent) } },
+        data: { lastTelegramDigestSentAt: new Date() },
+      });
+    }
+
     log.info({
       sent: sentCount,
       errors: errorCount,
+      telegramSent: telegramSentCount,
+      telegramErrors: telegramErrorCount,
       processedImportantDates: importantDates.length,
       processedContactReminders: peopleWithContactReminders.length,
     }, 'Reminders processed');
@@ -249,7 +399,7 @@ export const GET = withLogging(async function GET(request: Request) {
         data: {
           status: 'completed',
           duration,
-          message: `Sent ${sentCount} reminders, ${errorCount} errors`,
+          message: `Sent ${sentCount} email reminders and ${telegramSentCount} Telegram reminders, ${errorCount + telegramErrorCount} errors`,
         },
       });
     }
@@ -258,6 +408,8 @@ export const GET = withLogging(async function GET(request: Request) {
       success: true,
       sent: sentCount,
       errors: errorCount,
+      telegramSent: telegramSentCount,
+      telegramErrors: telegramErrorCount,
       processedImportantDates: importantDates.length,
       processedContactReminders: peopleWithContactReminders.length,
     });
@@ -415,6 +567,24 @@ function getIntervalMs(interval: number, unit: string): number {
   }
 }
 
+function isContactOverdue(
+  person: {
+    lastContact: Date | null;
+    contactReminderInterval: number | null;
+    contactReminderIntervalUnit: string | null;
+  },
+  today: Date
+): boolean {
+  if (!person.lastContact) {
+    return false;
+  }
+  const intervalMs = getIntervalMs(
+    person.contactReminderInterval || 1,
+    person.contactReminderIntervalUnit || 'MONTHS'
+  );
+  return today.getTime() - new Date(person.lastContact).getTime() >= intervalMs;
+}
+
 function shouldSendContactReminder(
   person: {
     lastContact: Date | null;
@@ -444,13 +614,13 @@ function shouldSendContactReminder(
     return false;
   }
 
-  // Check if we've already sent a reminder recently
   if (person.lastContactReminderSent) {
-    const timeSinceLastReminder =
-      today.getTime() - new Date(person.lastContactReminderSent).getTime();
-
-    // Don't send if we sent a reminder within the interval period
-    if (timeSinceLastReminder < intervalMs * 0.9) {
+    const lastSent = new Date(person.lastContactReminderSent);
+    if (
+      lastSent.getFullYear() === today.getFullYear() &&
+      lastSent.getMonth() === today.getMonth() &&
+      lastSent.getDate() === today.getDate()
+    ) {
       return false;
     }
   }

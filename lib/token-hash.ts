@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'crypto';
 
-export function generateToken(): string {
-  return randomBytes(32).toString('hex');
+export function generateToken(bytes = 32): string {
+  return randomBytes(bytes).toString('hex');
 }
 
 export function hashToken(token: string): string {

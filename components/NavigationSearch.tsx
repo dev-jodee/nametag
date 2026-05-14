@@ -189,7 +189,7 @@ export default function NavigationSearch() {
           <span className="text-xs">⌘</span>K
         </kbd>
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary"
+          className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 xl:w-4 xl:h-4 text-primary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

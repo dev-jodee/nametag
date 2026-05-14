@@ -17,6 +17,7 @@
     "test:e2e:debug": "playwright test --debug",
     "verify": "npm run lint && npm run typecheck && npm run test:run && npm run build",
     "verify:all": "npm run lint && npm run typecheck && npm run test:run && npm run test:e2e && npm run build",
+    "telegram:poll": "tsx scripts/poll-telegram-updates.ts",
     "seed:dev": "node_modules/.bin/tsx prisma/seed.ts",
     "seed:prod": "node prisma/seed.production.js"
   },

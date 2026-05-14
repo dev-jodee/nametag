@@ -4,6 +4,7 @@ import { parseAsLocalDate } from '@/lib/date-format';
 import { getTranslationsForLocale } from '@/lib/i18n-utils';
 import { getDateDisplayTitle } from '@/lib/important-date-types';
 import { getUserLocale } from '@/lib/locale';
+import { getPersonIdsWithFutureEvents } from '@/lib/services/event';
 
 export interface UpcomingEvent {
   id: string;
@@ -110,7 +111,7 @@ export async function getUpcomingEvents(userId: string): Promise<UpcomingEvent[]
   const nameOrder = user?.nameOrder;
   const nameDisplayFormat = user?.nameDisplayFormat;
 
-  const [importantDates, peopleWithContactReminders] = await Promise.all([
+  const [importantDates, peopleWithContactReminders, personIdsWithFutureEvents] = await Promise.all([
     prisma.importantDate.findMany({
       where: {
         person: { userId, deletedAt: null },
@@ -146,6 +147,7 @@ export async function getUpcomingEvents(userId: string): Promise<UpcomingEvent[]
         contactReminderIntervalUnit: true,
       },
     }),
+    getPersonIdsWithFutureEvents({ userId, today }),
   ]);
 
   const upcomingEvents: UpcomingEvent[] = [];
@@ -192,6 +194,10 @@ export async function getUpcomingEvents(userId: string): Promise<UpcomingEvent[]
 
   // Process contact reminders
   for (const person of peopleWithContactReminders) {
+    if (personIdsWithFutureEvents.has(person.id)) {
+      continue;
+    }
+
     const interval = person.contactReminderInterval || 1;
     const unit = person.contactReminderIntervalUnit || 'MONTHS';
     const intervalMs = getIntervalMs(interval, unit);

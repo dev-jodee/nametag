@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import BackLink from '@/components/BackLink';
 import { prisma } from '@/lib/prisma';
+import PersonEventsSection from '@/components/events/PersonEventsSection';
 import UserRelationshipCard from '@/components/UserRelationshipCard';
 import RelationshipManager from '@/components/RelationshipManager';
 import UnifiedNetworkGraph from '@/components/UnifiedNetworkGraph';
@@ -117,7 +118,7 @@ export default async function PersonDetailsPage({
   const nameOrder = user?.nameOrder;
   const nameDisplayFormat: NameDisplayFormat = user?.nameDisplayFormat || 'FULL';
 
-  const [person, allPeople, relationshipTypes, cardDavConnection, latestJournalEntry] = await Promise.all([
+  const [person, allPeople, relationshipTypes, cardDavConnection, latestJournalEntry, personEvents] = await Promise.all([
     prisma.person.findUnique({
       where: {
         id,
@@ -242,6 +243,19 @@ export default async function PersonDetailsPage({
         },
       },
       orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
+    }),
+    prisma.event.findMany({
+      where: {
+        userId: session.user.id,
+        people: { some: { id } },
+      },
+      include: {
+        people: {
+          where: { deletedAt: null },
+          select: { id: true, name: true, surname: true, nickname: true, photo: true },
+        },
+      },
+      orderBy: { date: 'asc' },
     }),
   ]);
 
@@ -729,6 +743,13 @@ export default async function PersonDetailsPage({
                 nameOrder={nameOrder}
                 nameDisplayFormat={nameDisplayFormat}
                 locale={user?.language || 'en'}
+              />
+
+              {/* Events Section */}
+              <PersonEventsSection
+                events={personEvents.map((e) => ({ ...e, date: e.date.toISOString() }))}
+                dateFormat={dateFormat as import('@/lib/date-format').DateFormat}
+                nameOrder={nameOrder}
               />
 
               {/* Relationship Network Section */}

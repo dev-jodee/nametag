@@ -143,6 +143,10 @@ describe('Locale Utilities', () => {
         nameOrder: 'WESTERN',
         nameDisplayFormat: 'FULL',
         graphMode: null,
+        timeZone: 'UTC',
+        telegramRemindersEnabled: false,
+        telegramReminderHour: 9,
+        lastTelegramDigestSentAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -183,6 +187,10 @@ describe('Locale Utilities', () => {
         nameOrder: 'WESTERN',
         nameDisplayFormat: 'FULL',
         graphMode: null,
+        timeZone: 'UTC',
+        telegramRemindersEnabled: false,
+        telegramReminderHour: 9,
+        lastTelegramDigestSentAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });

@@ -139,4 +139,30 @@ describe('CSRF Origin Validation', () => {
     });
     expect(validateOrigin(request)).toBe(true);
   });
+
+  it('should allow origin matching x-forwarded-host when host is internal', () => {
+    const request = new Request('http://nametag:3000/api/events', {
+      method: 'POST',
+      headers: {
+        origin: 'https://contacts.example.com',
+        host: 'nametag:3000',
+        'x-forwarded-host': 'contacts.example.com',
+        'x-forwarded-proto': 'https',
+      },
+    });
+    expect(validateOrigin(request)).toBe(true);
+  });
+
+  it('should use the first forwarded host and proto values', () => {
+    const request = new Request('http://nametag:3000/api/events', {
+      method: 'POST',
+      headers: {
+        origin: 'https://contacts.example.com',
+        host: 'nametag:3000',
+        'x-forwarded-host': 'contacts.example.com, proxy.internal',
+        'x-forwarded-proto': 'https, http',
+      },
+    });
+    expect(validateOrigin(request)).toBe(true);
+  });
 });

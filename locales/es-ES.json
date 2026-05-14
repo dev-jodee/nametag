@@ -59,7 +59,9 @@
       "signOut": "Cerrar sesión"
     },
     "journal": "Diario",
-    "createJournal": "Nueva entrada"
+    "createJournal": "Nueva entrada",
+    "events": "Eventos",
+    "calendar": "Calendario"
   },
   "settings": {
     "title": "Configuración",
@@ -159,6 +161,10 @@
       "errorUpdate": "Error al cambiar la contraseña",
       "errorConnection": "No se puede conectar al servidor. Por favor, verifica tu conexión e inténtalo de nuevo.",
       "successUpdate": "Contraseña cambiada correctamente"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "description": "Recordatorios y acciones de Telegram"
     },
     "carddav": {
       "title": "Sincronización CardDAV",
@@ -1838,6 +1844,83 @@
       "writeOne": "Escribe una",
       "viewAll": "Ver todas las entradas",
       "newEntry": "Nueva entrada"
+    }
+  },
+  "calendar": {
+    "title": "Calendario",
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "today": "Hoy",
+    "loading": "Cargando...",
+    "more": "más",
+    "viewFull": "Ver calendario completo",
+    "openCalendar": "Abrir calendario",
+    "months": {
+      "january": "Ene",
+      "february": "Feb",
+      "march": "Mar",
+      "april": "Abr",
+      "may": "May",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Ago",
+      "september": "Sep",
+      "october": "Oct",
+      "november": "Nov",
+      "december": "Dic"
+    },
+    "days": {
+      "sun": "Dom",
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb"
+    },
+    "legend": {
+      "birthday": "Cumpleaños",
+      "anniversary": "Aniversario",
+      "nameday": "Día del nombre",
+      "memorial": "Memorial",
+      "customDate": "Fecha personalizada",
+      "contactReminder": "Recordatorio de contacto",
+      "lastContact": "Último contacto",
+      "plannedEvent": "Evento planificado"
+    },
+    "loadError": "Error al cargar los eventos del calendario"
+  },
+  "events": {
+    "title": "Eventos",
+    "addEvent": "Agregar Evento",
+    "newEvent": "Nuevo Evento",
+    "editEvent": "Editar Evento",
+    "backToEvents": "Volver a Eventos",
+    "upcoming": "Próximos",
+    "past": "Pasados",
+    "noEvents": "Aún no hay eventos. ¡Planifica algo con tus contactos!",
+    "noEventsForPerson": "Aún no hay eventos planificados con esta persona.",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar este evento?",
+    "deleted": "Evento eliminado",
+    "deleteFailed": "Error al eliminar el evento",
+    "form": {
+      "title": "Título",
+      "titlePlaceholder": "ej. Café con amigos",
+      "dateTime": "Fecha y Hora",
+      "people": "Personas",
+      "peoplePlaceholder": "Buscar contactos...",
+      "titleRequired": "El título es obligatorio",
+      "dateRequired": "La fecha y hora son obligatorias",
+      "peopleRequired": "Por favor selecciona al menos una persona",
+      "saveFailed": "Error al guardar el evento",
+      "saving": "Guardando...",
+      "create": "Crear Evento",
+      "update": "Actualizar Evento",
+      "created": "Evento creado",
+      "updated": "Evento actualizado",
+      "cancel": "Cancelar"
     }
   }
 }
